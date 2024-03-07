@@ -382,6 +382,7 @@ texture_pressed = ExtResource("18")
 texture_hover = ExtResource("18")
 
 [node name="ColorRectSpacer" type="ColorRect" parent="VBoxContainer/HBoxContainer/configuration/VBoxContainer/animation/HBoxContainer2/HBoxContainer/MarginContainer2/GridContainer/Container_up"]
+visible = false
 modulate = Color(0.235294, 0.341176, 0.290196, 1)
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
@@ -429,6 +430,7 @@ texture_pressed = ExtResource("13")
 texture_hover = ExtResource("13")
 
 [node name="ColorRectSpacer" type="ColorRect" parent="VBoxContainer/HBoxContainer/configuration/VBoxContainer/animation/HBoxContainer2/HBoxContainer/MarginContainer2/GridContainer/Container_left"]
+visible = false
 modulate = Color(0.235294, 0.341176, 0.290196, 1)
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
@@ -491,15 +493,16 @@ texture_pressed = ExtResource("5")
 texture_hover = ExtResource("5")
 
 [node name="unset_dir_down" type="TextureButton" parent="VBoxContainer/HBoxContainer/configuration/VBoxContainer/animation/HBoxContainer2/HBoxContainer/MarginContainer2/GridContainer/Container_down" groups=["direction_buttons"]]
+visible = false
 layout_mode = 2
 tooltip_text = "Down animation (unconfigured)"
 toggle_mode = true
-button_pressed = true
 texture_normal = ExtResource("8")
 texture_pressed = ExtResource("33")
 texture_hover = ExtResource("33")
 
 [node name="ColorRectSpacer" type="ColorRect" parent="VBoxContainer/HBoxContainer/configuration/VBoxContainer/animation/HBoxContainer2/HBoxContainer/MarginContainer2/GridContainer/Container_down"]
+visible = false
 modulate = Color(0.235294, 0.341176, 0.290196, 1)
 custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
@@ -959,7 +962,11 @@ layout_mode = 2
 text = "Main Menu"
 
 [node name="ImageFileDialog" type="FileDialog" parent="."]
+mode = 2
+title = "Open a File"
 popup_window = true
+ok_button_text = "Öffnen"
+file_mode = 0
 access = 2
 filters = PackedStringArray("*.png, *.jpg, *.jpeg ; Supported Images")
 
@@ -1099,11 +1106,9 @@ character by changing the parent node to an ESCPlayer node.
 "
 
 [node name="help_window" parent="InformationWindows" instance=ExtResource("38")]
-visible = false
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="InformationWindows"]
 size = Vector2i(405, 132)
-visible = true
 popup_window = true
 dialog_text = "WARNING!
 

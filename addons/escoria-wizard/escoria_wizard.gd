@@ -30,6 +30,7 @@ func NewRoom_pressed() -> void:
 func CharacterCreator_pressed() -> void:
 	$Menu.visible = false
 	$CharacterCreator.visible = true
+	$CharacterCreator.character_creator_reset()
 
 	if plugin_reference == null:
 		get_node(GENERIC_ERROR_NODE).dialog_text = "Warning!\n\nExporting your character will fail when\n"
