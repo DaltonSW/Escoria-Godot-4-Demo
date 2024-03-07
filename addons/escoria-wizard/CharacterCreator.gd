@@ -152,10 +152,10 @@ func character_creator_reset() -> void:
 	animation_type_selected = "walk"
 
 	# For unknown reasons the above doesn't cause the trigger to fire so manual steps required
-	if get_node(ANIM_TYPE_NODE).get_node("talk_checkbox").pressed:
+	if get_node(ANIM_TYPE_NODE).get_node("talk_checkbox").is_pressed():
 		get_node(ANIM_TYPE_NODE).get_node("talk_checkbox").button_pressed = false
 
-	if get_node(ANIM_TYPE_NODE).get_node("idle_checkbox").pressed:
+	if get_node(ANIM_TYPE_NODE).get_node("idle_checkbox").is_pressed():
 		get_node(ANIM_TYPE_NODE).get_node("idle_checkbox").button_pressed = false
 
 	get_node(NO_SPRITESHEET_NODE).visible = true
@@ -454,7 +454,7 @@ func store_animation(animation_to_store: String) -> void:
 		METADATA_SPRITESHEET_FIRST_FRAME: get_node(ANIM_CONTROLS_NODE).get_node("start_frame").value,
 		METADATA_SPRITESHEET_LAST_FRAME: get_node(ANIM_CONTROLS_NODE).get_node("end_frame").value,
 		METADATA_SPEED: get_node(ANIM_CONTROLS_NODE).get_node("anim_speed_scroll_bar").value,
-		METADATA_IS_MIRROR: get_node(MIRROR_NODE).pressed
+		METADATA_IS_MIRROR: get_node(MIRROR_NODE).is_pressed()
 	}
 
 	var metadata_array_offset: int = get_metadata_array_offset()
@@ -546,7 +546,7 @@ func preview_update() -> void:
 		var current_anim_type = return_current_animation_type()
 		var anim_name = "%s_%s" % [current_anim_type, direction_selected]
 		var offset = get_metadata_array_offset()
-		var generate_mirror = get_node(MIRROR_NODE).pressed
+		var generate_mirror = get_node(MIRROR_NODE).is_pressed()
 
 		var texture
 		var rect_location
@@ -669,7 +669,7 @@ func animation_on_mirror_checkbox_toggled(button_pressed: bool) -> void:
 	if not has_spritesheet_been_loaded():
 		get_node(GENERIC_ERROR_NODE).dialog_text = "No animation has been configured."
 		get_node(GENERIC_ERROR_NODE).popup_centered()
-		get_node(MIRROR_NODE).button_pressed = false
+		get_node(MIRROR_NODE).set_pressed(false)
 		return
 
 	var opp_dir = find_opposite_direction(direction_selected)
@@ -845,11 +845,11 @@ func spritesheet_on_export_button_pressed() -> void:
 		get_node(GENERIC_ERROR_NODE).popup_centered()
 		return
 
-	if get_node(DIR_COUNT_NODE).get_node("four_directions").pressed:
+	if get_node(DIR_COUNT_NODE).get_node("four_directions").is_pressed():
 		dirnames = DIR_LIST_4
-	elif get_node(DIR_COUNT_NODE).get_node("eight_directions").pressed:
+	elif get_node(DIR_COUNT_NODE).get_node("eight_directions").is_pressed():
 		dirnames = DIR_LIST_8
-	elif get_node(DIR_COUNT_NODE).get_node("two_directions").pressed:
+	elif get_node(DIR_COUNT_NODE).get_node("two_directions").is_pressed():
 		dirnames = DIR_LIST_2
 	else:
 		dirnames = DIR_LIST_1
@@ -937,7 +937,7 @@ func nodename_on_node_name_text_changed(new_text: String) -> void:
 # If 8 directions was already selected, don't let it be unselected.
 # If 4 directions was selected, unselect it.
 func directions_on_eight_directions_pressed() -> void:
-	if not get_node(DIR_COUNT_NODE).get_node("eight_directions").pressed:
+	if not get_node(DIR_COUNT_NODE).get_node("eight_directions").is_pressed():
 		# Don't let them untick all boxes
 		get_node(DIR_COUNT_NODE).get_node("eight_directions").button_pressed = true
 
@@ -949,13 +949,14 @@ func directions_on_eight_directions_pressed() -> void:
 # If 4 directions was already selected, don't let it be unselected.
 # If previously selected direction is now invalid, change it to a valid one.
 func directions_on_four_directions_pressed() -> void:
-	if not get_node(DIR_COUNT_NODE).get_node("four_directions").pressed:
+	var checkbox: CheckBox = get_node(DIR_COUNT_NODE).get_node("four_directions")
+	if not checkbox.is_pressed():
 		# Don't let them untick all boxes
-		get_node(DIR_COUNT_NODE).get_node("four_directions").button_pressed = true
+		checkbox.set_pressed(true)
 	else:
 		# Current direction is illegal
 		for loop in ["eight_directions", "two_directions", "one_direction"]:
-			get_node(DIR_COUNT_NODE).get_node(loop).button_pressed = false
+			get_node(DIR_COUNT_NODE).get_node(loop).set_pressed(false)
 		if not direction_selected in DIR_LIST_4:
 			direction_selected = DIR_UP
 			activate_direction(DIR_UP)
@@ -965,7 +966,7 @@ func directions_on_four_directions_pressed() -> void:
 # If 2 directions was already selected, don't let it be unselected.
 # If previously selected direction is now invalid, change it to a valid one.
 func directions_on_two_directions_pressed() -> void:
-	if not get_node(DIR_COUNT_NODE).get_node("two_directions").pressed:
+	if not get_node(DIR_COUNT_NODE).get_node("two_directions").is_pressed():
 		# Don't let them untick all boxes
 		get_node(DIR_COUNT_NODE).get_node("two_directions").button_pressed = true
 	else:
@@ -981,7 +982,7 @@ func directions_on_two_directions_pressed() -> void:
 # If 1 direction was already selected, don't let it be unselected.
 # If previously selected direction is now invalid, change it to a valid one.
 func directions_on_one_direction_pressed() -> void:
-	if not get_node(DIR_COUNT_NODE).get_node("one_direction").pressed:
+	if not get_node(DIR_COUNT_NODE).get_node("one_direction").is_pressed():
 		# Don't let them untick all boxes
 		get_node(DIR_COUNT_NODE).get_node("one_direction").button_pressed = true
 	else:
@@ -997,11 +998,11 @@ func directions_on_one_direction_pressed() -> void:
 func return_current_animation_type() -> String:
 	var animation_type: String = ""
 
-	if get_node(ANIM_TYPE_NODE).get_node("walk_checkbox").pressed:
+	if get_node(ANIM_TYPE_NODE).get_node("walk_checkbox").is_pressed():
 		animation_type = TYPE_WALK
-	elif get_node(ANIM_TYPE_NODE).get_node("talk_checkbox").pressed:
+	elif get_node(ANIM_TYPE_NODE).get_node("talk_checkbox").is_pressed():
 		animation_type = TYPE_TALK
-	elif get_node(ANIM_TYPE_NODE).get_node("idle_checkbox").pressed:
+	elif get_node(ANIM_TYPE_NODE).get_node("idle_checkbox").is_pressed():
 		animation_type = TYPE_IDLE
 
 	assert(not animation_type.is_empty(), "No animation type selected.")
@@ -1054,6 +1055,7 @@ func activate_direction(direction) -> void:
 
 		get_node(ANIM_CONTROLS_NODE).get_node("start_frame").value = 0
 		get_node(ANIM_CONTROLS_NODE).get_node("end_frame").value = 0
+
 		preview_hide()
 	else:
 		get_node(ARROWS_NODE).get_node("Container_%s" % direction).get_node("set_dir_%s" % direction).button_pressed = true
@@ -1079,8 +1081,8 @@ func activate_direction(direction) -> void:
 		preview_update()
 
 		# Restart animation otherwise it will first complete all the frames before changing to the new animation
-		get_node(PREVIEW_NODE).get_node("anim_preview_sprite").playing = false
-		get_node(PREVIEW_NODE).get_node("anim_preview_sprite").playing = true
+		get_node(PREVIEW_NODE).get_node("anim_preview_sprite").stop()
+		get_node(PREVIEW_NODE).get_node("anim_preview_sprite").play()
 	currently_changing_direction = false
 
 # Store the metadata for the animation changes for the current direction
@@ -1127,18 +1129,18 @@ func reset_arrow_colours() -> void:
 	get_node(ARROWS_NODE).get_node("Container_left").get_node("ColorRectSpacer").visible = false
 	get_node(ARROWS_NODE).get_node("Container_down").get_node("ColorRectSpacer").visible = false
 	var dir_list=DIR_LIST_8
-	if get_node(DIR_COUNT_NODE).get_node("four_directions").pressed:
+	if get_node(DIR_COUNT_NODE).get_node("four_directions").is_pressed():
 		dir_list=DIR_LIST_4
 		if not direction_selected in DIR_LIST_4:
 			direction_selected = DIR_UP
 #		get_node(ARROWS_NODE).get_node("Container_up").get_node("ColorRectSpacer").visible = true
-	if get_node(DIR_COUNT_NODE).get_node("two_directions").pressed:
+	if get_node(DIR_COUNT_NODE).get_node("two_directions").is_pressed():
 		dir_list=DIR_LIST_2
 		if not direction_selected in DIR_LIST_2:
 			direction_selected = DIR_RIGHT
 		get_node(ARROWS_NODE).get_node("Container_up").get_node("ColorRectSpacer").visible = true
 		get_node(ARROWS_NODE).get_node("Container_down").get_node("ColorRectSpacer").visible = true
-	if get_node(DIR_COUNT_NODE).get_node("one_direction").pressed:
+	if get_node(DIR_COUNT_NODE).get_node("one_direction").is_pressed():
 		dir_list=DIR_LIST_1
 		if not direction_selected in DIR_LIST_1:
 			direction_selected = DIR_DOWN
@@ -1238,11 +1240,11 @@ func export_player(scene_name) -> void:
 	get_node(EXPORT_PROGRESS_NODE).get_node("progress_bar").visible = true
 	get_node(EXPORT_PROGRESS_NODE).get_node("progress_label").visible = true
 
-	if get_node(DIR_COUNT_NODE).get_node("eight_directions").pressed:
+	if get_node(DIR_COUNT_NODE).get_node("eight_directions").is_pressed():
 		num_directions = 8
-	if get_node(DIR_COUNT_NODE).get_node("four_directions").pressed:
+	if get_node(DIR_COUNT_NODE).get_node("four_directions").is_pressed():
 		num_directions = 4
-	if get_node(DIR_COUNT_NODE).get_node("two_directions").pressed:
+	if get_node(DIR_COUNT_NODE).get_node("two_directions").is_pressed():
 		num_directions = 2
 	else:
 		num_directions = 1
@@ -1250,7 +1252,7 @@ func export_player(scene_name) -> void:
 	var new_character
 	# NPCs can't be ESCPlayers or the player won't walk up to them when
 	# you interact with them
-	if get_node(CHAR_TYPE_NODE).get_node("npc").pressed:
+	if get_node(CHAR_TYPE_NODE).get_node("npc").is_pressed():
 		new_character = ESCItem.new()
 	else:
 		new_character = ESCPlayer.new()
@@ -1274,17 +1276,17 @@ func export_player(scene_name) -> void:
 	animations_resource.idles = []
 	animations_resource.speaks = []
 
-	if get_node(DIR_COUNT_NODE).get_node("four_directions").pressed:
+	if get_node(DIR_COUNT_NODE).get_node("four_directions").is_pressed():
 		num_directions = 4
 		start_angle_array = [315, 45, 135, 225]
 		angle_size = 90
 		dirnames = DIR_LIST_4
-	elif get_node(DIR_COUNT_NODE).get_node("eight_directions").pressed:
+	elif get_node(DIR_COUNT_NODE).get_node("eight_directions").is_pressed():
 		num_directions = 8
 		start_angle_array = [337, 22, 67, 112, 157, 202, 247, 292]
 		angle_size = 45
 		dirnames = DIR_LIST_8
-	elif get_node(DIR_COUNT_NODE).get_node("two_directions").pressed:
+	elif get_node(DIR_COUNT_NODE).get_node("two_directions").is_pressed():
 		num_directions = 2
 		start_angle_array = [0, 180]
 		angle_size = 180
@@ -1339,7 +1341,7 @@ func export_player(scene_name) -> void:
 	dialog_position.position.y = -(export_largest_sprite.y * 1.2)
 	new_character.add_child(dialog_position)
 
-	if get_node(CHAR_TYPE_NODE).get_node("npc").pressed:
+	if get_node(CHAR_TYPE_NODE).get_node("npc").is_pressed():
 	# Add Interaction Position to an NPC
 		var interaction_position = ESCLocation.new()
 		interaction_position.name = "interact_position"
