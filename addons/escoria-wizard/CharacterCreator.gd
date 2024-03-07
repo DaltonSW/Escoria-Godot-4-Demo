@@ -353,7 +353,7 @@ func create_empty_animations() -> void:
 
 	sframes.add_animation(ANIM_IN_PROGRESS)
 
-	get_node(PREVIEW_NODE).get_node("anim_preview_sprite").frames = sframes
+	get_node(PREVIEW_NODE).get_node("anim_preview_sprite").sprite_frames = sframes
 
 
 # Loads a spritesheet and calculates the size of each sprite frame if loading a spritesheet
@@ -366,9 +366,7 @@ func load_spritesheet(file_to_load, read_settings_from_metadata: bool = false, m
 
 	assert(not errorval, "Error loading file %s" % str(file_to_load))
 
-	var texture = ImageTexture.new()
-	texture.create_from_image(source_image)
-	texture.set_flags(2)
+	var texture = ImageTexture.create_from_image(source_image)
 
 	get_node(SCROLL_CTRL_NODE).get_node("spritesheet_sprite").texture = texture
 
@@ -382,7 +380,7 @@ func load_spritesheet(file_to_load, read_settings_from_metadata: bool = false, m
 		get_node(ANIM_CONTROLS_NODE).get_node("v_frames_spin_box").value = 1
 		get_node(ANIM_CONTROLS_NODE).get_node("start_frame").value = 1
 		get_node(ANIM_CONTROLS_NODE).get_node("end_frame").value = 1
-
+	
 	calc_sprite_size()
 
 	get_node(CURRENT_SHEET_NODE).text = file_to_load
@@ -430,7 +428,7 @@ func draw_frame_outlines() -> void:
 	get_node(SCROLL_CTRL_NODE).get_node("frame_rectangles").start_cell = get_node(ANIM_CONTROLS_NODE).get_node("start_frame").value
 	get_node(SCROLL_CTRL_NODE).get_node("frame_rectangles").end_cell = get_node(ANIM_CONTROLS_NODE).get_node("end_frame").value
 	get_node(SCROLL_CTRL_NODE).get_node("frame_rectangles").cell_size = frame_size
-	get_node(SCROLL_CTRL_NODE).get_node("frame_rectangles").update()
+	get_node(SCROLL_CTRL_NODE).get_node("frame_rectangles").queue_redraw()
 
 
 # When given a frame number, this calculates the pixel coordinates that frame in the spritesheet
@@ -526,7 +524,7 @@ func unmirror_animation(anim_to_unmirror: String) -> void:
 func preview_show():
 	get_node(PREVIEW_NODE).get_node("no_anim_found_sprite").visible = false
 	get_node(PREVIEW_NODE).get_node("anim_preview_sprite").visible = true
-
+	get_node(PREVIEW_NODE).get_node("anim_preview_sprite").play()
 
 # Hides the preview animation. Required when the no_anim_found sprite doesn't cover the
 # whole preview due to UI peculiarities.
@@ -552,26 +550,21 @@ func preview_update() -> void:
 
 		var texture
 		var rect_location
-		var frame_being_copied = Image.new()
-		var frame_counter: int = 0
-
-		get_node(PREVIEW_NODE).get_node("anim_preview_sprite").frames.clear(ANIM_IN_PROGRESS)
-
-		frame_being_copied.create(frame_size.x, frame_size.y, false, source_image.get_format())
+		var frame_being_copied
+		
+		get_node(PREVIEW_NODE).get_node("anim_preview_sprite").stop()
+		get_node(PREVIEW_NODE).get_node("anim_preview_sprite").sprite_frames.clear(ANIM_IN_PROGRESS)
+		
+		frame_being_copied = Image.create(frame_size.x, frame_size.y, false, source_image.get_format())
 
 		for loop in range(get_node(ANIM_CONTROLS_NODE).get_node("end_frame").value - get_node(ANIM_CONTROLS_NODE).get_node("start_frame").value + 1):
-			texture = ImageTexture.new()
 			rect_location = calc_frame_coords(get_node(ANIM_CONTROLS_NODE).get_node("start_frame").value + loop)
 			frame_being_copied.blit_rect(source_image, Rect2(rect_location, Vector2(frame_size.x, frame_size.y)), Vector2(0, 0))
-
 			if generate_mirror:
 				frame_being_copied.flip_x()
-
-			texture.create_from_image(frame_being_copied)
-			# Remove the image filter to make pixel correct graphics
-			texture.set_flags(2)
-			get_node(PREVIEW_NODE).get_node("anim_preview_sprite").frames.add_frame(ANIM_IN_PROGRESS, texture, frame_counter)
-			frame_counter += 1
+				
+			texture = ImageTexture.create_from_image(frame_being_copied)
+			get_node(PREVIEW_NODE).get_node("anim_preview_sprite").sprite_frames.add_frame(ANIM_IN_PROGRESS, texture)
 		preview_show()
 
 		# Calculate the scale to make the preview as big as possible in the preview window depending on
@@ -721,7 +714,7 @@ func controls_on_anim_speed_scroll_bar_value_changed(value: float) -> void:
 	check_if_controls_have_changed()
 
 	get_node(ANIM_CONTROLS_NODE).get_node("anim_speed_label").text = "%s: %s FPS" % [ANIMATION_SPEED_LABEL, value]
-	get_node(PREVIEW_NODE).get_node("anim_preview_sprite").frames.set_animation_speed(ANIM_IN_PROGRESS, value)
+	get_node(PREVIEW_NODE).get_node("anim_preview_sprite").sprite_frames.set_animation_speed(ANIM_IN_PROGRESS, value)
 
 	preview_update()
 
@@ -817,7 +810,7 @@ func controls_on_v_frames_spin_box_value_changed(value: float) -> void:
 		return
 
 	spritesheet_settings[1] = get_node(ANIM_CONTROLS_NODE).get_node("v_frames_spin_box").value
-
+	
 	preview_show()
 
 	check_if_controls_have_changed()
