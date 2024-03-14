@@ -887,35 +887,42 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 
-[node name="store_anim" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer"]
-visible = false
+[node name="store_anim_wrapper" type="Control" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer"]
 custom_minimum_size = Vector2(300, 100)
 layout_mode = 2
+
+[node name="store_anim" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim_wrapper"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_constants/separation = 10
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim_wrapper/store_anim"]
 layout_mode = 2
 
-[node name="name_colorrect2" type="ColorRect" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim/MarginContainer"]
+[node name="name_colorrect2" type="ColorRect" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim_wrapper/store_anim/MarginContainer"]
 layout_mode = 2
 color = Color(0.215686, 0.478431, 0.235294, 1)
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim/MarginContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim_wrapper/store_anim/MarginContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim/MarginContainer/MarginContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim_wrapper/store_anim/MarginContainer/MarginContainer"]
 layout_mode = 2
 size_flags_vertical = 6
 text = "Store Animation
 "
 
-[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim"]
+[node name="CenterContainer2" type="CenterContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim_wrapper/store_anim"]
 layout_mode = 2
 
-[node name="anim_store_button" type="Button" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim/CenterContainer2"]
+[node name="anim_store_button" type="Button" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim_wrapper/store_anim/CenterContainer2"]
 layout_mode = 2
 text = "Store Animation"
 
@@ -937,7 +944,7 @@ layout_mode = 2
 color = Color(0.215686, 0.478431, 0.235294, 1)
 
 [node name="empty_node2" type="Control" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer"]
-custom_minimum_size = Vector2(0, 280)
+custom_minimum_size = Vector2(0, 190)
 layout_mode = 2
 
 [node name="MarginContainer3" type="CenterContainer" parent="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer"]
@@ -1157,7 +1164,7 @@ you will lose your current character.
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/spritesheet/MarginContainer/VBoxContainer/zoom_scroll/zoom_reset_button" to="." method="spritesheet_on_zoom_reset_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/CenterContainer/load_spritesheet_button" to="." method="spritesheet_on_load_spritesheet_button_pressed"]
 [connection signal="changed" from="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/spritesheet_details_container/GridContainer/anim_speed_scroll_bar" to="." method="controls_on_anim_speed_scroll_bar_value_changed"]
-[connection signal="pressed" from="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim/CenterContainer2/anim_store_button" to="." method="store_on_anim_store_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/store_anim_wrapper/store_anim/CenterContainer2/anim_store_button" to="." method="store_on_anim_store_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/MarginContainer2/VBoxContainer/export_button" to="." method="spritesheet_on_export_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/MarginContainer3/HBoxContainer/help_button" to="." method="spritesheet_on_help_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/spritesheet_controls/VBoxContainer/MarginContainer3/HBoxContainer/reset_button" to="." method="spritesheet_on_reset_button_pressed"]
