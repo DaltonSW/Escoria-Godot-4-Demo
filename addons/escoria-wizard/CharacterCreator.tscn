@@ -373,7 +373,6 @@ texture_pressed = ExtResource("23")
 texture_hover = ExtResource("23")
 
 [node name="unset_dir_up" type="TextureButton" parent="VBoxContainer/HBoxContainer/configuration/VBoxContainer/animation/HBoxContainer2/HBoxContainer/MarginContainer2/GridContainer/Container_up" groups=["direction_buttons"]]
-visible = false
 layout_mode = 2
 tooltip_text = "Up animation (unconfigured)"
 toggle_mode = true
@@ -422,7 +421,6 @@ texture_pressed = ExtResource("26")
 texture_hover = ExtResource("26")
 
 [node name="unset_dir_left" type="TextureButton" parent="VBoxContainer/HBoxContainer/configuration/VBoxContainer/animation/HBoxContainer2/HBoxContainer/MarginContainer2/GridContainer/Container_left" groups=["direction_buttons"]]
-visible = false
 layout_mode = 2
 tooltip_text = "Left animation (unconfigured)"
 toggle_mode = true
@@ -452,7 +450,6 @@ texture_pressed = ExtResource("4")
 texture_hover = ExtResource("4")
 
 [node name="unset_dir_right" type="TextureButton" parent="VBoxContainer/HBoxContainer/configuration/VBoxContainer/animation/HBoxContainer2/HBoxContainer/MarginContainer2/GridContainer/Container_right" groups=["direction_buttons"]]
-visible = false
 layout_mode = 2
 tooltip_text = "Right animation (unconfigured)"
 toggle_mode = true
@@ -494,7 +491,6 @@ texture_pressed = ExtResource("5")
 texture_hover = ExtResource("5")
 
 [node name="unset_dir_down" type="TextureButton" parent="VBoxContainer/HBoxContainer/configuration/VBoxContainer/animation/HBoxContainer2/HBoxContainer/MarginContainer2/GridContainer/Container_down" groups=["direction_buttons"]]
-visible = false
 layout_mode = 2
 tooltip_text = "Down animation (unconfigured)"
 toggle_mode = true
