@@ -972,7 +972,10 @@ filters = PackedStringArray("*.png, *.jpg, *.jpeg ; Supported Images")
 
 [node name="CharacterPathFileDialog" type="FileDialog" parent="."]
 mode = 2
+title = "Open a Directory"
 popup_window = true
+ok_button_text = "Aktuellen Ordner auswählen"
+file_mode = 2
 
 [node name="InformationWindows" type="Control" parent="."]
 visible = false
