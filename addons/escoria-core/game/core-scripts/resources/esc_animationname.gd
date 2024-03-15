@@ -8,3 +8,6 @@ class_name ESCAnimationName
 
 # Animation mirror (false is no mirror, true is mirrored)
 @export var mirrored: bool
+
+func _to_string():
+	return "ESCAnimationName {animation: %s, mirrored: %s}" % [animation, str(mirrored)]

@@ -9,3 +9,6 @@ class_name ESCDirectionAngle
 
 # Size of the angle
 @export var angle_size: int
+
+func _to_string():
+	return "ESCDirectionAngle {angle_start: %d, angle_size: %d}" % [angle_start, angle_size]
