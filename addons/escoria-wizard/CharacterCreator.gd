@@ -64,7 +64,8 @@ const GENERIC_ERROR_NODE   = "InformationWindows/generic_error_window"
 const UNSTORED_CHANGE_NODE = "InformationWindows/unstored_changes_window"
 const UNSTORED_ANIMTYPE_CHANGE_NODE = "InformationWindows/unstored_changes_window_anim_change"
 const EXPORT_PROGRESS_NODE = "InformationWindows/export_progress"
-const PROGRESS_LABEL_NODE  = "InformationWindows/export_progress/progress_label"
+const PROGRESS_LABEL_NODE  = "InformationWindows/export_progress/MarginContainer/VBoxContainer/progress_label"
+const PROGRESS_BAR_NODE    = "InformationWindows/export_progress/MarginContainer/VBoxContainer/progress_bar"
 const EXPORT_COMPLETE_NODE = "InformationWindows/export_complete"
 const FILE_DIALOG_NODE     = "ImageFileDialog"
 const CHARACTER_FILE_NODE  = "CharacterPathFileDialog"
@@ -1218,6 +1219,104 @@ func find_opposite_direction(direction:String) -> String:
 	assert(not opposite_dir.is_empty(), "This should never happen : direction = %s" % direction)
 	return opposite_dir
 
+func export_player_new(
+	num_directions: int = 4,
+	is_player: bool = true,
+	name: String = 'testchar',
+	global_id: String = 'testchar'
+) -> void:
+		
+	var start_angle_array
+	var angle_size
+	var dirnames
+	match num_directions:
+		1:
+			start_angle_array = [0]
+			angle_size = 360
+			dirnames = DIR_LIST_1
+		2:
+			num_directions = 2
+			start_angle_array = [0, 180]
+			angle_size = 180
+			dirnames = DIR_LIST_2
+		4:
+			num_directions = 4
+			start_angle_array = [315, 45, 135, 225]
+			angle_size = 90
+			dirnames = DIR_LIST_4
+		8:
+			num_directions = 8
+			start_angle_array = [337, 22, 67, 112, 157, 202, 247, 292]
+			angle_size = 45
+			dirnames = DIR_LIST_8
+	print("Exporting player...")
+	print("Directions: ", num_directions)
+	print("Start angle array: ", start_angle_array)
+	print("Angle size: ", angle_size)
+	print("Dir names: ", dirnames)
+	print("Name: ", name, ", Global ID: ", global_id, ", Is player: ", is_player)
+	
+	# Create the Player / NPC (Item)
+	var new_character
+	# NPCs can't be ESCPlayers or the player won't walk up to them when
+	# you interact with them
+	if not is_player:
+		new_character = ESCItem.new()
+	else:
+		new_character = ESCPlayer.new()
+		new_character.selectable = true
+	new_character.name = name
+	new_character.tooltip_name = name
+	new_character.global_id = global_id
+	if global_id == null:
+		new_character.global_id = new_character.name
+	new_character.default_action = "look"
+	
+	print("Entity created. Start generating animations.")
+	
+	# Animations
+	var animations_resource: ESCAnimationResource = ESCAnimationResource.new()
+	# This is necessary to avoid a Godot bug when appending to one array
+	# appends to all arrays in the same class (possibly for resources only).
+	animations_resource.dir_angles = []
+	animations_resource.directions = []
+	animations_resource.idles = []
+	animations_resource.speaks = []
+	
+	for loop in range(num_directions):
+		# Need to create new objects here each time in order to avoid having multiple references
+		# to the same objects.
+		var dir_angle = ESCDirectionAngle.new()
+		var anim_details: ESCAnimationName
+		
+		var angle_start = start_angle_array[loop]
+		var current_dir_name = dirnames[loop]
+
+		dir_angle.angle_start = angle_start
+		dir_angle.angle_size = angle_size
+		animations_resource.dir_angles.append(dir_angle)
+		print("Appended Angle ", dir_angle)
+
+		anim_details = _create_esc_animation(TYPE_WALK, current_dir_name)
+		animations_resource.directions.append(anim_details)
+		print("Appended walk anim to ESCAnimationResource", anim_details)
+
+		anim_details = _create_esc_animation(TYPE_TALK, current_dir_name)
+		animations_resource.speaks.append(anim_details)
+		print("Appended speak anim to ESCAnimationResource", anim_details)
+
+		anim_details = _create_esc_animation(TYPE_IDLE, current_dir_name)
+		animations_resource.idles.append(anim_details)
+		print("Appended idle anim to ESCAnimationResource", anim_details)
+		
+	print("Animation Resource created.")
+	
+	export_largest_sprite = Vector2.ONE
+	# Need to yield on the child function so this function doesn't continue
+	# when the child yields
+	export_generate_animations(new_character, num_directions)
+	
+	
 
 # Creates an ESCPlayer node based on the settings configured in the wizard.
 # It will save it as a scene (named based on the name provided in the GUI text box)
@@ -1236,9 +1335,9 @@ func export_player(scene_name) -> void:
 
 	disconnect_selector_signals()
 	get_node(EXPORT_PROGRESS_NODE).popup_centered()
-	get_node(EXPORT_PROGRESS_NODE).get_node("progress_bar").value = 0
-	get_node(EXPORT_PROGRESS_NODE).get_node("progress_bar").visible = true
-	get_node(EXPORT_PROGRESS_NODE).get_node("progress_label").visible = true
+	get_node(PROGRESS_BAR_NODE).value = 0
+	get_node(PROGRESS_BAR_NODE).visible = true
+	get_node(PROGRESS_LABEL_NODE).visible = true
 
 	if get_node(DIR_COUNT_NODE).get_node("eight_directions").is_pressed():
 		num_directions = 8
@@ -1267,14 +1366,14 @@ func export_player(scene_name) -> void:
 
 	new_character.default_action = "look"
 
-	var animations_resource = ESCAnimationResource.new()
+	var animations_resource: ESCAnimationResource = ESCAnimationResource.new()
 
 	# This is necessary to avoid a Godot bug when appending to one array
 	# appends to all arrays in the same class (possibly for resources only).
-	animations_resource.dir_angles = []
-	animations_resource.directions = []
-	animations_resource.idles = []
-	animations_resource.speaks = []
+	# animations_resource.dir_angles = []
+	# animations_resource.directions = []
+	# animations_resource.idles = []
+	# animations_resource.speaks = []
 
 	if get_node(DIR_COUNT_NODE).get_node("four_directions").is_pressed():
 		num_directions = 4
@@ -1370,11 +1469,12 @@ func export_player(scene_name) -> void:
 
 	progress_bar_update("Packing scene - this might take up to 30 seconds")
 	await get_tree().process_frame
-	packed_scene.pack(get_tree().edited_scene_root.get_node(new_character.name))
+	packed_scene.pack(get_tree().edited_scene_root.get_node(str(new_character.name)))
 
 	progress_bar_update("Resource saving - this might take up to 30 seconds")
 	await get_tree().process_frame
 	# Flag suggestions from https://godotengine.org/qa/50437/how-to-turn-a-node-into-a-packedscene-via-gdscript
+	# TODO SCRIPT ERROR: Invalid type in function 'save' in base 'ResourceSaver'. Cannot convert argument 1 from String to Object.
 	ResourceSaver.save(scene_name, packed_scene, ResourceSaver.FLAG_CHANGE_PATH|ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS|ResourceSaver.FLAG_COMPRESS)
 
 	progress_bar_update("Releasing resources - this might take up to 30 seconds")
@@ -1393,7 +1493,7 @@ func export_player(scene_name) -> void:
 # Updates the text in the export window so the user knows what's happening
 func progress_bar_update(message, bar_increase_amount = 1) -> void:
 	get_node(PROGRESS_LABEL_NODE).text = message
-	get_node(EXPORT_PROGRESS_NODE).get_node("progress_bar").value += bar_increase_amount
+	get_node(PROGRESS_BAR_NODE).value += bar_increase_amount
 
 
 # When exporting the ESCPlayer, this function loads the relevant spritesheets based on the
@@ -1407,10 +1507,10 @@ func export_generate_animations(character_node, num_directions) -> void:
 	var direction_names
 	var loaded_spritesheet: String
 	var largest_frame_dimensions: Vector2 = Vector2.ZERO
-	var sprite_frames = SpriteFrames.new()
+	var sprite_frames: SpriteFrames = SpriteFrames.new()
 	var default_anim_length = 0
 	var default_anim_speed = 1
-	var texture
+	var texture: ImageTexture
 	var frame_counter: int = 0
 
 	match num_directions:
@@ -1442,7 +1542,8 @@ func export_generate_animations(character_node, num_directions) -> void:
 
 			var rect_location
 			var frame_being_copied = Image.new()
-			sprite_frames.add_animation_library(anim_name)
+			sprite_frames.add_animation(anim_name)
+			# sprite_frames.add_animation_library(anim_name)
 
 			if metadata[METADATA_SPRITESHEET_SOURCE_FILE] != loaded_spritesheet:
 				load_spritesheet(metadata[METADATA_SPRITESHEET_SOURCE_FILE], true, get_metadata_array_offset(anim_dir, animtype))
@@ -1461,13 +1562,13 @@ func export_generate_animations(character_node, num_directions) -> void:
 				default_anim_speed = metadata[METADATA_SPEED]
 
 			for loop in range(metadata[METADATA_SPRITESHEET_LAST_FRAME] - metadata[METADATA_SPRITESHEET_FIRST_FRAME]  + 1):
-				texture = ImageTexture.new()
 				rect_location = calc_frame_coords(metadata[METADATA_SPRITESHEET_FIRST_FRAME] + loop)
 				frame_being_copied.blit_rect(source_image, Rect2(rect_location, Vector2(frame_size.x, frame_size.y)), Vector2(0, 0))
-				texture.create_from_image(frame_being_copied)
+				texture = ImageTexture.create_from_image(frame_being_copied)
 
 				# Remove "filter" flag so it's pixel perfect
-				texture.set_flags(2)
+				# TODO ? Not available in Godot4
+				# texture.set_flags(2)
 				sprite_frames.add_frame (anim_name, texture, frame_counter )
 				sprite_frames.set_animation_speed(anim_name, metadata[METADATA_SPEED])
 				frame_counter += 1
@@ -1477,10 +1578,12 @@ func export_generate_animations(character_node, num_directions) -> void:
 	# default animation will be used.
 	for loop in range(default_anim_length):
 		texture = ImageTexture.new()
-		texture = sprite_frames.get_frame("idle_down", loop)
+		# texture = sprite_frames.get_frame("idle_down", loop)
+		texture = sprite_frames.get_frame_texture("idle_down", loop)
 
 		# Remove "filter" flag so it's pixel perfect
-		texture.set_flags(2)
+		# TODO ? Not available in Godot4
+		# texture.set_flags(2)
 		sprite_frames.add_frame ("default", texture, loop )
 		sprite_frames.set_animation_speed("default", default_anim_speed)
 
@@ -1494,7 +1597,7 @@ func export_generate_animations(character_node, num_directions) -> void:
 		animated_sprite.animation = "%s_%s" % [TYPE_IDLE, DIR_DOWN]
 	animated_sprite.position.y = -(largest_frame_dimensions.y / 2)	# Place feet at (0,0)
 	animated_sprite.animation = "default"
-	animated_sprite.playing = true
+	animated_sprite.play()
 	character_node.add_child(animated_sprite)
 	# Making the owner "character_node" rather than "get_tree().edited_scene_root" means that
 	# when saving as a packed scene, the child nodes get saved under the parent (as the parent
