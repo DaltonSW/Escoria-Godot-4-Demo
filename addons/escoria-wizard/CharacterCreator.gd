@@ -1225,7 +1225,7 @@ func export_player_new(
 	name: String = 'testchar',
 	global_id: String = 'testchar'
 ) -> void:
-		
+	
 	var start_angle_array
 	var angle_size
 	var dirnames
@@ -1296,7 +1296,7 @@ func export_player_new(
 		dir_angle.angle_size = angle_size
 		animations_resource.dir_angles.append(dir_angle)
 		print("Appended Angle ", dir_angle)
-
+		
 		anim_details = _create_esc_animation(TYPE_WALK, current_dir_name)
 		animations_resource.directions.append(anim_details)
 		print("Appended walk anim to ESCAnimationResource", anim_details)
@@ -1309,12 +1309,13 @@ func export_player_new(
 		animations_resource.idles.append(anim_details)
 		print("Appended idle anim to ESCAnimationResource", anim_details)
 		
-	print("Animation Resource created.")
+	print("Animation Resource created. Start creating animations")
 	
 	export_largest_sprite = Vector2.ONE
 	# Need to yield on the child function so this function doesn't continue
 	# when the child yields
-	export_generate_animations(new_character, num_directions)
+	export_generate_animations(new_character, num_directions, dirnames)
+	print("Animations exported")
 	
 	
 
@@ -1419,7 +1420,7 @@ func export_player(scene_name) -> void:
 	export_largest_sprite = Vector2.ONE
 	# Need to yield on the child function so this function doesn't continue
 	# when the child yields
-	export_generate_animations(new_character, num_directions)
+	export_generate_animations(new_character, num_directions, dirnames)
 	# Add Collision shape to the ESCPlayer
 	var rectangle_shape = RectangleShape2D.new()
 	var collision_shape = CollisionShape2D.new()
@@ -1500,11 +1501,14 @@ func progress_bar_update(message, bar_increase_amount = 1) -> void:
 # animation metadata, and copies the frames to the relevant animations within the animatedsprite
 # attached to the ESCPlayer.
 #func export_generate_animations(character_node, num_directions) -> Vector2:
-func export_generate_animations(character_node, num_directions) -> void:
+func export_generate_animations(
+	character_node: ESCItem, 
+	num_directions: int,
+	direction_names: Array
+) -> void:
 	# This variable is used instead of running this function in a thread as I hit this issue
 	# when I tried to thread this - https://github.com/godotengine/godot/issues/38058
 	var display_refresh_timer:int = Time.get_ticks_msec()
-	var direction_names
 	var loaded_spritesheet: String
 	var largest_frame_dimensions: Vector2 = Vector2.ZERO
 	var sprite_frames: SpriteFrames = SpriteFrames.new()
@@ -1512,12 +1516,6 @@ func export_generate_animations(character_node, num_directions) -> void:
 	var default_anim_speed = 1
 	var texture: ImageTexture
 	var frame_counter: int = 0
-
-	match num_directions:
-		1: direction_names = DIR_LIST_1
-		2: direction_names = DIR_LIST_2
-		4: direction_names = DIR_LIST_4
-		8: direction_names = DIR_LIST_8
 
 	for animtype in [TYPE_WALK, TYPE_TALK, TYPE_IDLE]:
 		for anim_dir in direction_names:
@@ -1541,7 +1539,6 @@ func export_generate_animations(character_node, num_directions) -> void:
 				continue
 
 			var rect_location
-			var frame_being_copied = Image.new()
 			sprite_frames.add_animation(anim_name)
 			# sprite_frames.add_animation_library(anim_name)
 
@@ -1555,7 +1552,8 @@ func export_generate_animations(character_node, num_directions) -> void:
 
 				if (frame_size.y / 2) > largest_frame_dimensions.y:
 					largest_frame_dimensions.y = frame_size.y
-			frame_being_copied.create(frame_size.x, frame_size.y, false, source_image.get_format())
+					
+			var frame_being_copied = Image.create(frame_size.x, frame_size.y, false, source_image.get_format())
 
 			if animtype == TYPE_IDLE and anim_dir == "down":
 				default_anim_length = metadata[METADATA_SPRITESHEET_LAST_FRAME] - metadata[METADATA_SPRITESHEET_FIRST_FRAME]  + 1
