@@ -73,7 +73,7 @@ const CONFIG_FILE          = "escoria-wizard.conf"
 
 
 # Test flag - set to true to load test data.
-var test_mode: bool = true
+var test_mode: bool = false
 
 # The currently loaded spritesheet image
 var source_image: Image
@@ -903,9 +903,7 @@ func spritesheet_on_export_button_pressed() -> void:
 	else:
 		num_directions = 1
 
-
-	#export_player(scene_name)
-	export_player_new(
+	export_player(
 		num_directions,
 		get_node(CHAR_TYPE_NODE).get_node("npc").is_pressed(),
 		get_node(NAME_NODE).get_node("node_name").text,
@@ -1238,7 +1236,14 @@ func find_opposite_direction(direction:String) -> String:
 	assert(not opposite_dir.is_empty(), "This should never happen : direction = %s" % direction)
 	return opposite_dir
 
-func export_player_new(
+# Creates an ESCPlayer node based on the settings configured in the wizard.
+# It will save it as a scene (named based on the name provided in the GUI text box)
+# and open it in the Godot editor - which is why this utility has to run as a plugin.
+# This will also create an ESCDialogue position, and a collision box. The collision box will
+# be sized based on the widest and tallest frames encountered during export (note that the
+# widest/tallest frame settings do not necessarily come from the same animation frame but are
+# from all the animation frames.
+func export_player(
 	num_directions: int = 4,
 	is_player: bool = true,
 	name: String = 'testchar',
@@ -1371,7 +1376,7 @@ func export_player_new(
 	await get_tree().process_frame
 
 	if not is_player:
-	# Add Interaction Position to an NPC
+		# Add Interaction Position to an NPC
 		var interaction_position = ESCLocation.new()
 		interaction_position.name = "interact_position"
 		interaction_position.position.y = +(export_largest_sprite.y * 1.2)
@@ -1413,15 +1418,14 @@ func export_player_new(
 
 	var scene_name = "%s/%s.scn" % [character_path, name]
 	# Flag suggestions from https://godotengine.org/qa/50437/how-to-turn-a-node-into-a-packedscene-via-gdscript
-	# TODO SCRIPT ERROR: Invalid type in function 'save' in base 'ResourceSaver'. Cannot convert argument 1 from String to Object.
 	ResourceSaver.save(packed_scene, scene_name, ResourceSaver.FLAG_CHANGE_PATH|ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS|ResourceSaver.FLAG_COMPRESS)
 
 	progress_bar_update("Releasing resources - this might take up to 30 seconds")
 	await get_tree().process_frame
 	new_character.queue_free()
-
+	
 	if is_plugin_execution:
-		get_tree().edited_scene_root.get_node(new_character.name).queue_free()
+		get_tree().edited_scene_root.get_node(str(new_character.name)).queue_free()
 		var plugin_reference = get_node("..").plugin_reference
 		plugin_reference.open_scene(scene_name)
 		plugin_reference._make_visible(false)
@@ -1430,181 +1434,6 @@ func export_player_new(
 
 	connect_selector_signals()
 	
-	
-
-# Creates an ESCPlayer node based on the settings configured in the wizard.
-# It will save it as a scene (named based on the name provided in the GUI text box)
-# and open it in the Godot editor - which is why this utility has to run as a plugin.
-# This will also create an ESCDialogue position, and a collision box. The collision box will
-# be sized based on the widest and tallest frames encountered during export (note that the
-# widest/tallest frame settings do not necessarily come from the same animation frame but are
-# from all the animation frames.
-func export_player(scene_name) -> void:
-	var num_directions
-	var start_angle_array
-	var angle_size
-	var dirnames
-
-	var plugin_reference = get_node("..").plugin_reference
-
-	disconnect_selector_signals()
-	get_node(EXPORT_PROGRESS_NODE).popup_centered()
-	get_node(PROGRESS_BAR_NODE).value = 0
-	get_node(PROGRESS_BAR_NODE).visible = true
-	get_node(PROGRESS_LABEL_NODE).visible = true
-
-	if get_node(DIR_COUNT_NODE).get_node("eight_directions").is_pressed():
-		num_directions = 8
-	if get_node(DIR_COUNT_NODE).get_node("four_directions").is_pressed():
-		num_directions = 4
-	if get_node(DIR_COUNT_NODE).get_node("two_directions").is_pressed():
-		num_directions = 2
-	else:
-		num_directions = 1
-
-	var new_character
-	# NPCs can't be ESCPlayers or the player won't walk up to them when
-	# you interact with them
-	if get_node(CHAR_TYPE_NODE).get_node("npc").is_pressed():
-		new_character = ESCItem.new()
-	else:
-		new_character = ESCPlayer.new()
-		new_character.selectable = true
-	new_character.name = get_node(NAME_NODE).get_node("node_name").text
-
-	if get_node(NAME_NODE).get_node("global_id").text == null:
-		new_character.global_id = new_character.name
-
-	new_character.global_id = get_node(NAME_NODE).get_node("global_id").text
-	new_character.tooltip_name = get_node(NAME_NODE).get_node("node_name").text
-
-	new_character.default_action = "look"
-
-	var animations_resource: ESCAnimationResource = ESCAnimationResource.new()
-
-	# This is necessary to avoid a Godot bug when appending to one array
-	# appends to all arrays in the same class (possibly for resources only).
-	# animations_resource.dir_angles = []
-	# animations_resource.directions = []
-	# animations_resource.idles = []
-	# animations_resource.speaks = []
-
-	if get_node(DIR_COUNT_NODE).get_node("four_directions").is_pressed():
-		num_directions = 4
-		start_angle_array = [315, 45, 135, 225]
-		angle_size = 90
-		dirnames = DIR_LIST_4
-	elif get_node(DIR_COUNT_NODE).get_node("eight_directions").is_pressed():
-		num_directions = 8
-		start_angle_array = [337, 22, 67, 112, 157, 202, 247, 292]
-		angle_size = 45
-		dirnames = DIR_LIST_8
-	elif get_node(DIR_COUNT_NODE).get_node("two_directions").is_pressed():
-		num_directions = 2
-		start_angle_array = [0, 180]
-		angle_size = 180
-		dirnames = DIR_LIST_2
-	else:
-		num_directions = 1
-		start_angle_array = [0]
-		angle_size = 360
-		dirnames = DIR_LIST_1
-
-	for loop in range(num_directions):
-		# Need to create new objects here each time in order to avoid having multiple references
-		# to the same objects.
-		var dir_angle = ESCDirectionAngle.new()
-		var anim_details: ESCAnimationName
-
-		dir_angle.angle_start = start_angle_array[loop]
-		dir_angle.angle_size = angle_size
-		animations_resource.dir_angles.append(dir_angle)
-
-		anim_details = _create_esc_animation(TYPE_WALK, dirnames[loop])
-		animations_resource.directions.append(anim_details)
-
-		anim_details = _create_esc_animation(TYPE_TALK, dirnames[loop])
-		animations_resource.speaks.append(anim_details)
-
-		anim_details = _create_esc_animation(TYPE_IDLE, dirnames[loop])
-		animations_resource.idles.append(anim_details)
-
-#	var largest_sprite = export_generate_animations(new_character, num_directions)
-	export_largest_sprite = Vector2.ONE
-	# Need to yield on the child function so this function doesn't continue
-	# when the child yields
-	export_generate_animations(new_character, num_directions, dirnames)
-	# Add Collision shape to the ESCPlayer
-	var rectangle_shape = RectangleShape2D.new()
-	var collision_shape = CollisionShape2D.new()
-	collision_shape.name = "CollisionShape2D"
-	progress_bar_update("Creating collision shape")
-	await get_tree().process_frame
-
-	collision_shape.shape = rectangle_shape
-	collision_shape.shape.extents = export_largest_sprite / 2
-	collision_shape.position.y = -(export_largest_sprite.y / 2)
-
-	new_character.add_child(collision_shape)
-	progress_bar_update("Setting up dialog position")
-	await get_tree().process_frame
-
-	# Add Dialog Position to the ESCPlayer
-	var dialog_position = ESCLocation.new()
-	dialog_position.name = "dialog_position"
-	dialog_position.position.y = -(export_largest_sprite.y * 1.2)
-	new_character.add_child(dialog_position)
-
-	if get_node(CHAR_TYPE_NODE).get_node("npc").is_pressed():
-	# Add Interaction Position to an NPC
-		var interaction_position = ESCLocation.new()
-		interaction_position.name = "interact_position"
-		interaction_position.position.y = +(export_largest_sprite.y * 1.2)
-		new_character.add_child(interaction_position)
-		interaction_position.set_owner(new_character)
-
-	progress_bar_update("Configuring animations")
-	await get_tree().process_frame
-	# Make it so all the nodes can be seen in the scene tree
-	new_character.animations = animations_resource
-	progress_bar_update("Adding child to scene tree")
-	await get_tree().process_frame
-	get_tree().edited_scene_root.add_child(new_character)
-	new_character.set_owner(get_tree().edited_scene_root)
-
-	# Making the owner "new_character" rather than "get_tree().edited_scene_root" means that
-	# when saving as a packed scene, the child nodes get saved under the parent (as the parent
-	# must own the child nodes). If the owner is not the scene root though, the nodes will NOT
-	# show up in the scene tree.
-	collision_shape.set_owner(new_character)
-	dialog_position.set_owner(new_character)
-
-	# Export scene
-	var packed_scene = PackedScene.new()
-
-	progress_bar_update("Packing scene - this might take up to 30 seconds")
-	await get_tree().process_frame
-	packed_scene.pack(get_tree().edited_scene_root.get_node(str(new_character.name)))
-
-	progress_bar_update("Resource saving - this might take up to 30 seconds")
-	await get_tree().process_frame
-	# Flag suggestions from https://godotengine.org/qa/50437/how-to-turn-a-node-into-a-packedscene-via-gdscript
-	# TODO SCRIPT ERROR: Invalid type in function 'save' in base 'ResourceSaver'. Cannot convert argument 1 from String to Object.
-	ResourceSaver.save(scene_name, packed_scene, ResourceSaver.FLAG_CHANGE_PATH|ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS|ResourceSaver.FLAG_COMPRESS)
-
-	progress_bar_update("Releasing resources - this might take up to 30 seconds")
-	await get_tree().process_frame
-	new_character.queue_free()
-
-	get_tree().edited_scene_root.get_node(new_character.name).queue_free()
-	plugin_reference.open_scene(scene_name)
-	plugin_reference._make_visible(false)
-	get_node(EXPORT_PROGRESS_NODE).hide()
-	get_node(EXPORT_COMPLETE_NODE).popup_centered()
-
-	connect_selector_signals()
-
-
 # Updates the text in the export window so the user knows what's happening
 func progress_bar_update(message, bar_increase_amount = 1) -> void:
 	get_node(PROGRESS_LABEL_NODE).text = message
@@ -1614,15 +1443,11 @@ func progress_bar_update(message, bar_increase_amount = 1) -> void:
 # When exporting the ESCPlayer, this function loads the relevant spritesheets based on the
 # animation metadata, and copies the frames to the relevant animations within the animatedsprite
 # attached to the ESCPlayer.
-#func export_generate_animations(character_node, num_directions) -> Vector2:
 func export_generate_animations(
 	character_node: ESCItem, 
 	num_directions: int,
 	direction_names: Array
 ) -> void:
-	# This variable is used instead of running this function in a thread as I hit this issue
-	# when I tried to thread this - https://github.com/godotengine/godot/issues/38058
-	var display_refresh_timer:int = Time.get_ticks_msec()
 	var loaded_spritesheet: String
 	var largest_frame_dimensions: Vector2 = Vector2.ZERO
 	var sprite_frames: SpriteFrames = SpriteFrames.new()
@@ -1633,14 +1458,6 @@ func export_generate_animations(
 
 	for animtype in [TYPE_WALK, TYPE_TALK, TYPE_IDLE]:
 		for anim_dir in direction_names:
-			# Using this in place of threads due to the above mentioned issue so that the
-			# UI continues to update while the export is running
-			var current_ticks = Time.get_ticks_msec()
-			if current_ticks - display_refresh_timer > 30:
-				await get_tree().process_frame
-
-				display_refresh_timer = current_ticks
-
 			if num_directions == 4:
 				progress_bar_update("Processing "+str(animtype)+" "+str(anim_dir),2)
 			else:
@@ -1654,7 +1471,6 @@ func export_generate_animations(
 
 			var rect_location
 			sprite_frames.add_animation(anim_name)
-			# sprite_frames.add_animation_library(anim_name)
 
 			if metadata[METADATA_SPRITESHEET_SOURCE_FILE] != loaded_spritesheet:
 				load_spritesheet(metadata[METADATA_SPRITESHEET_SOURCE_FILE], true, get_metadata_array_offset(anim_dir, animtype))
