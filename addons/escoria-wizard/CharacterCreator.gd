@@ -1347,6 +1347,7 @@ func export_player_new(
 	# Add Collision shape to the ESCPlayer
 	var rectangle_shape = RectangleShape2D.new()
 	var collision_shape = CollisionShape2D.new()
+	collision_shape.name = "CollisionShape2D"
 	progress_bar_update("Creating collision shape")
 	await get_tree().process_frame
 
@@ -1536,6 +1537,7 @@ func export_player(scene_name) -> void:
 	# Add Collision shape to the ESCPlayer
 	var rectangle_shape = RectangleShape2D.new()
 	var collision_shape = CollisionShape2D.new()
+	collision_shape.name = "CollisionShape2D"
 	progress_bar_update("Creating collision shape")
 	await get_tree().process_frame
 
@@ -1698,6 +1700,7 @@ func export_generate_animations(
 		sprite_frames.set_animation_speed("default", default_anim_speed)
 
 	var animated_sprite = AnimatedSprite2D.new()
+	animated_sprite.name = "AnimatedSprite2D"
 
 	progress_bar_update("Adding sprite frames to node")
 	animated_sprite.frames = sprite_frames
