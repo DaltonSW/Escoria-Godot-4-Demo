@@ -73,7 +73,7 @@ const CONFIG_FILE          = "escoria-wizard.conf"
 
 
 # Test flag - set to true to load test data.
-var test_mode: bool = false
+var test_mode: bool = true
 
 # The currently loaded spritesheet image
 var source_image: Image
@@ -893,7 +893,26 @@ func spritesheet_on_export_button_pressed() -> void:
 
 #	export_thread = Thread.new()
 #	export_thread.start(self, "export_player")
-	export_player(scene_name)
+	var num_directions: int
+	if get_node(DIR_COUNT_NODE).get_node("eight_directions").is_pressed():
+		num_directions = 8
+	if get_node(DIR_COUNT_NODE).get_node("four_directions").is_pressed():
+		num_directions = 4
+	if get_node(DIR_COUNT_NODE).get_node("two_directions").is_pressed():
+		num_directions = 2
+	else:
+		num_directions = 1
+
+
+	#export_player(scene_name)
+	export_player_new(
+		num_directions,
+		get_node(CHAR_TYPE_NODE).get_node("npc").is_pressed(),
+		get_node(NAME_NODE).get_node("node_name").text,
+		get_node(NAME_NODE).get_node("global_id").text,
+		get_node(NAME_NODE).get_node("character_path").text,
+		true
+		)
 
 # Update the spritesheet zoom and scrollbars
 func spritesheet_on_zoom_scrollbar_value_changed(value: float) -> void:
@@ -1660,7 +1679,7 @@ func export_generate_animations(
 				# Remove "filter" flag so it's pixel perfect
 				# TODO ? Not available in Godot4
 				# texture.set_flags(2)
-				sprite_frames.add_frame (anim_name, texture, frame_counter )
+				sprite_frames.add_frame(anim_name, texture, 1.0, frame_counter )
 				sprite_frames.set_animation_speed(anim_name, metadata[METADATA_SPEED])
 				frame_counter += 1
 
