@@ -1223,8 +1223,16 @@ func export_player_new(
 	num_directions: int = 4,
 	is_player: bool = true,
 	name: String = 'testchar',
-	global_id: String = 'testchar'
+	global_id: String = 'testchar',
+	character_path: String = 'res://game/characters/testchar',
+	is_plugin_execution: bool = false
 ) -> void:
+	
+	disconnect_selector_signals()
+	get_node(EXPORT_PROGRESS_NODE).popup_centered()
+	get_node(PROGRESS_BAR_NODE).value = 0
+	get_node(PROGRESS_BAR_NODE).visible = true
+	get_node(PROGRESS_LABEL_NODE).visible = true
 	
 	var start_angle_array
 	var angle_size
@@ -1315,7 +1323,92 @@ func export_player_new(
 	# Need to yield on the child function so this function doesn't continue
 	# when the child yields
 	export_generate_animations(new_character, num_directions, dirnames)
-	print("Animations exported")
+	print("Animations exported. Creating collision shape.")
+	
+	# Add Collision shape to the ESCPlayer
+	var rectangle_shape = RectangleShape2D.new()
+	var collision_shape = CollisionShape2D.new()
+	progress_bar_update("Creating collision shape")
+	await get_tree().process_frame
+
+	collision_shape.shape = rectangle_shape
+	collision_shape.shape.extents = export_largest_sprite / 2
+	collision_shape.position.y = -(export_largest_sprite.y / 2)
+
+	new_character.add_child(collision_shape)
+	print("Collision shape created. Setup dialog position.")
+	
+	progress_bar_update("Setting up dialog position")
+	await get_tree().process_frame
+
+	# Add Dialog Position to the ESCPlayer
+	var dialog_position = ESCLocation.new()
+	dialog_position.name = "dialog_position"
+	dialog_position.position.y = -(export_largest_sprite.y * 1.2)
+	new_character.add_child(dialog_position)
+	
+	progress_bar_update("Setting up dialog position")
+	await get_tree().process_frame
+
+	if not is_player:
+	# Add Interaction Position to an NPC
+		var interaction_position = ESCLocation.new()
+		interaction_position.name = "interact_position"
+		interaction_position.position.y = +(export_largest_sprite.y * 1.2)
+		new_character.add_child(interaction_position)
+		interaction_position.set_owner(new_character)
+
+	progress_bar_update("Configuring animations")
+	await get_tree().process_frame
+	# Make it so all the nodes can be seen in the scene tree
+	new_character.animations = animations_resource
+	progress_bar_update("Adding child to scene tree")
+	await get_tree().process_frame
+
+	# Only working as a plugin
+	if is_plugin_execution:
+		get_tree().edited_scene_root.add_child(new_character)
+		new_character.set_owner(get_tree().edited_scene_root)
+
+	# Making the owner "new_character" rather than "get_tree().edited_scene_root" means that
+	# when saving as a packed scene, the child nodes get saved under the parent (as the parent
+	# must own the child nodes). If the owner is not the scene root though, the nodes will NOT
+	# show up in the scene tree.
+	collision_shape.set_owner(new_character)
+	dialog_position.set_owner(new_character)
+
+	# Export scene
+	var packed_scene = PackedScene.new()
+
+	print("Packing scene.")
+	progress_bar_update("Packing scene - this might take up to 30 seconds")
+	await get_tree().process_frame
+	if is_plugin_execution:
+		packed_scene.pack(get_tree().edited_scene_root.get_node(str(new_character.name)))
+	else:
+		packed_scene.pack(new_character)
+	print("Packing scene done. Packing resources.")
+	progress_bar_update("Resource saving - this might take up to 30 seconds")
+	await get_tree().process_frame
+
+	var scene_name = "%s/%s.scn" % [character_path, name]
+	# Flag suggestions from https://godotengine.org/qa/50437/how-to-turn-a-node-into-a-packedscene-via-gdscript
+	# TODO SCRIPT ERROR: Invalid type in function 'save' in base 'ResourceSaver'. Cannot convert argument 1 from String to Object.
+	ResourceSaver.save(packed_scene, scene_name, ResourceSaver.FLAG_CHANGE_PATH|ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS|ResourceSaver.FLAG_COMPRESS)
+
+	progress_bar_update("Releasing resources - this might take up to 30 seconds")
+	await get_tree().process_frame
+	new_character.queue_free()
+
+	if is_plugin_execution:
+		get_tree().edited_scene_root.get_node(new_character.name).queue_free()
+		var plugin_reference = get_node("..").plugin_reference
+		plugin_reference.open_scene(scene_name)
+		plugin_reference._make_visible(false)
+	get_node(EXPORT_PROGRESS_NODE).hide()
+	get_node(EXPORT_COMPLETE_NODE).popup_centered()
+
+	connect_selector_signals()
 	
 	
 
