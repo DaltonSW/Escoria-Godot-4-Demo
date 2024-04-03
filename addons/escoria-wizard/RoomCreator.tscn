@@ -246,14 +246,17 @@ text = "Main Menu"
 layout_mode = 2
 
 [node name="PlayerSceneFileDialog" type="FileDialog" parent="InformationWindows"]
+size = Vector2i(500, 400)
 popup_window = true
 filters = PackedStringArray("*.tscn, *.scn ; Scene Files")
 
 [node name="ESCScriptFileDialog" type="FileDialog" parent="InformationWindows"]
+size = Vector2i(500, 400)
 popup_window = true
 filters = PackedStringArray("*.esc; Escoria script files")
 
 [node name="BackgroundImageFileDialog" type="FileDialog" parent="InformationWindows"]
+size = Vector2i(500, 400)
 popup_window = true
 filters = PackedStringArray("*.png, *.jpg, *.jpeg ; Supported Images")
 
@@ -280,8 +283,8 @@ popup_window = true
 dialog_text = "The room has been created."
 
 [node name="RoomFolderDialog" type="FileDialog" parent="InformationWindows"]
-mode = 2
 title = "Open a Directory"
+size = Vector2i(500, 400)
 popup_window = true
 ok_button_text = "Aktuellen Ordner auswählen"
 file_mode = 2
