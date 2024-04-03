@@ -15,6 +15,7 @@ var settings_modified: bool
 @onready var dialog_player_scene_file: FileDialog = $InformationWindows/PlayerSceneFileDialog
 @onready var dialog_background_image_file: FileDialog = $InformationWindows/BackgroundImageFileDialog
 @onready var dialog_room_folder: FileDialog = $InformationWindows/RoomFolderDialog
+@onready var error_dialog_generic: AcceptDialog = $InformationWindows/GenericErrorDialog
 
 
 func _ready() -> void:
@@ -98,9 +99,11 @@ func _on_UseEmptyRoomScript_toggled(button_pressed: bool) -> void:
 		%ESCScript.editable = true
 		%ESCScript.text = "%s.esc" % %GlobalID.text
 
+
 func _on_ESCScriptFileDialog_file_selected(path: String) -> void:
 	settings_modified = true
 	%ESCScript.text = path
+
 
 func _on_UseEmptyBackground_toggled(button_pressed: bool) -> void:
 	if button_pressed == true:
@@ -200,28 +203,64 @@ func _on_RoomFolderDialog_dir_selected(dir: String) -> void:
 	ProjectSettings.add_property_info(property_info)
 	%RoomFolder.text = dir
 
+# Creates the room.
+func create_room(
+	room_name: String,
+	global_id: String,
+	script_name: String,
+	room_base_dir: String
+) -> void:
+	# Check parameters first
+	if room_name.length() < 1:
+		error_dialog_generic.dialog_text = "Error!\n\nRoom name must be specified."
+		error_dialog_generic.popup_centered()
+		return
+	
+	# User wants a script. Check filename
+	if not %NoRoomScript.button_pressed:
+		if not script_name.ends_with(".esc") and script_name.length() > 4:
+			error_dialog_generic.dialog_text = "Error!\n\n" \
+			+ "Room ESC script must be a valid filename ending in '.esc'"
+			error_dialog_generic.popup_centered()
+			return
+		if "/" in script_name:
+			error_dialog_generic.dialog_text = "Error!\n\n" \
+			+ "Please remove any '/' characters from the name of the Room ESC script."
+			error_dialog_generic.popup_centered()
+			return
+	
+	# Checks okay. Let's do this!	
+	# Create Room
+	var new_room: ESCRoom = ESCRoom.new()
+	new_room.name = room_name
+	new_room.global_id = global_id
+	# Attach script
+	if not %NoRoomScript.button_pressed:
+		new_room.esc_script = "%s/%s/scripts/%s" % [room_base_dir, room_name, script_name]
+		
+	
 
 func _on_CreateButton_pressed() -> void:
 	var RoomName = %RoomName.text
 
 	if RoomName.length() < 1:
-		$"InformationWindows/GenericErrorDialog".dialog_text = "Error!\n\nRoom name must be specified."
-		$"InformationWindows/GenericErrorDialog".popup_centered()
+		error_dialog_generic.dialog_text = "Error!\n\nRoom name must be specified."
+		error_dialog_generic.popup_centered()
 		return
 
 	var ScriptName = %ESCScript.text
 
 	if %UseEmptyRoomScript.button_pressed == false:
 		if ScriptName.length() < 5 or ! ScriptName.substr(ScriptName.length() - 4) == ".esc":
-			$"InformationWindows/GenericErrorDialog".dialog_text = "Error!\n\n" \
+			error_dialog_generic.dialog_text = "Error!\n\n" \
 			+ "Room ESC script must be a filename ending in '.esc'"
-			$"InformationWindows/GenericErrorDialog".popup_centered()
+			error_dialog_generic.popup_centered()
 			return
 
 	if "/" in %ESCScript.text:
-			$"InformationWindows/GenericErrorDialog".dialog_text = "Error!\n\n" \
+			error_dialog_generic.dialog_text = "Error!\n\n" \
 			+ "Please remove any '/' characters from the name of the Room ESC script."
-			$"InformationWindows/GenericErrorDialog".popup_centered()
+			error_dialog_generic.popup_centered()
 			return
 
 	var BaseDir = ProjectSettings.get_setting(ROOM_PATH_SETTING)
