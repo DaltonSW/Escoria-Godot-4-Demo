@@ -305,8 +305,9 @@ func _on_CreateButton_pressed() -> void:
 	get_tree().edited_scene_root.get_node(NewRoom.name).queue_free()
 	# Scan the filesystem so that the new folders show up in the file browser.
 	# Without this you might not see the objects/scripts folders in the filetree.
-	var ep = EditorPlugin.new()
-	ep.get_editor_interface().get_resource_filesystem().scan()
-	ep.free()
+	# TODO: Check if necessary in Godot4
+	# var ep = EditorPlugin.new()
+	# ep.get_editor_interface().get_resource_filesystem().scan()
+	# ep.free()
 
 	$InformationWindows/CreateCompleteDialog.popup_centered()
