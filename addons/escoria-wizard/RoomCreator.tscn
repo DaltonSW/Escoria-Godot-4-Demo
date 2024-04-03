@@ -281,7 +281,10 @@ dialog_text = "The room has been created."
 
 [node name="RoomFolderDialog" type="FileDialog" parent="InformationWindows"]
 mode = 2
+title = "Open a Directory"
 popup_window = true
+ok_button_text = "Aktuellen Ordner auswählen"
+file_mode = 2
 
 [connection signal="text_changed" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/RoomName" to="." method="_on_RoomName_text_changed"]
 [connection signal="text_changed" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/GlobalID" to="." method="_on_GlobalID_text_changed"]
