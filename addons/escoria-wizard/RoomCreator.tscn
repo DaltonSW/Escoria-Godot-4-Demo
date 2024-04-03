@@ -123,12 +123,11 @@ layout_mode = 2
 tooltip_text = "In the room's scripts folder
 an empty file will be created
 with this name."
-text = "Room will not have a script configured."
-editable = false
+text = ".esc"
 caret_blink = true
 caret_blink_interval = 0.5
 
-[node name="UseEmptyRoomScript" type="CheckButton" parent="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer"]
+[node name="NoRoomScript" type="CheckButton" parent="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "No script"
@@ -293,7 +292,7 @@ file_mode = 2
 [connection signal="text_changed" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/GlobalID" to="." method="_on_GlobalID_text_changed"]
 [connection signal="toggled" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/UseEmptyPlayerButton" to="." method="_on_UseEmptyPlayerButton_toggled"]
 [connection signal="pressed" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/SelectPlayerScene" to="." method="_on_SelectPlayerScene_pressed"]
-[connection signal="toggled" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/UseEmptyRoomScript" to="." method="_on_UseEmptyRoomScript_toggled"]
+[connection signal="toggled" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/NoRoomScript" to="." method="_on_UseEmptyRoomScript_toggled"]
 [connection signal="toggled" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/UseEmptyBackground" to="." method="_on_UseEmptyBackground_toggled"]
 [connection signal="pressed" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/SelectBackground" to="." method="_on_SelectBackground_pressed"]
 [connection signal="pressed" from="MarginContainer/MarginContainer/VBoxContainer/MarginContainer/GridContainer/ChangeRoomFolderButton" to="." method="_on_ChangeRoomFolderButton_pressed"]
