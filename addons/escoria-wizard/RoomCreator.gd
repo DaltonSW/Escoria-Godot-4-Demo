@@ -12,10 +12,14 @@ const ROOM_PATH_SETTING         = "escoria/wizard/path_to_rooms"
 
 var settings_modified: bool
 
+@onready var dialog_player_scene_file: FileDialog = $InformationWindows/PlayerSceneFileDialog
+@onready var dialog_background_image_file: FileDialog = $InformationWindows/BackgroundImageFileDialog
+@onready var dialog_room_folder: FileDialog = $InformationWindows/RoomFolderDialog
+
 
 func _ready() -> void:
-	$"InformationWindows/PlayerSceneFileDialog".get_cancel_button().connect("pressed", Callable(self, "PlayerSceneCancelled"))
-	$"InformationWindows/BackgroundImageFileDialog".get_cancel_button().connect("pressed", Callable(self, "BackgroundFileCancelled"))
+	dialog_player_scene_file.get_cancel_button().connect("pressed", Callable(self, "PlayerSceneCancelled"))
+	dialog_background_image_file.get_cancel_button().connect("pressed", Callable(self, "BackgroundFileCancelled"))
 	
 	for c in $InformationWindows.get_children():
 		c.hide()
@@ -51,7 +55,7 @@ func room_creator_reset() -> void:
 	%RoomBackground.visible = true
 	%BackgroundPreview.texture = null
 	%RoomFolder.text = roompath if roompath else ""
-	$InformationWindows/RoomFolderDialog.current_dir = roompath if roompath else ""
+	dialog_room_folder.current_dir = roompath if roompath else ""
 	settings_modified = false
 
 
@@ -73,12 +77,12 @@ func _on_UseEmptyPlayerButton_toggled(button_pressed: bool) -> void:
 		%SelectPlayerScene.visible = true
 		%SelectPlayerSceneSpacer.visible = false
 		%PlayerScene.text = PLAYER_SELECT_TEXT
-		$"InformationWindows/PlayerSceneFileDialog".popup_centered()
+		dialog_player_scene_file.popup_centered()
 
 
 func _on_SelectPlayerScene_pressed() -> void:
-	$"InformationWindows/PlayerSceneFileDialog".visible = true
-	$"InformationWindows/PlayerSceneFileDialog".invalidate()
+	dialog_player_scene_file.visible = true
+	dialog_player_scene_file.invalidate()
 
 
 func _on_PlayerSceneFileDialog_file_selected(path: String) -> void:
@@ -94,16 +98,9 @@ func _on_UseEmptyRoomScript_toggled(button_pressed: bool) -> void:
 		%ESCScript.editable = true
 		%ESCScript.text = "%s.esc" % %GlobalID.text
 
-
-func _on_SelectRoomScript_pressed() -> void:
-	$"InformationWindows/ESCScriptFileDialog".visible = true
-	$"InformationWindows/ESCScriptFileDialog".invalidate()
-
-
 func _on_ESCScriptFileDialog_file_selected(path: String) -> void:
 	settings_modified = true
 	%ESCScript.text = path
-
 
 func _on_UseEmptyBackground_toggled(button_pressed: bool) -> void:
 	if button_pressed == true:
@@ -118,21 +115,21 @@ func _on_UseEmptyBackground_toggled(button_pressed: bool) -> void:
 		%BackgroundImage.text = BACKGROUND_SELECT_TEXT
 
 		var viewport_centre: Vector2 = get_viewport_rect().size / 2
-		var dialog_start: Vector2 = $"InformationWindows/BackgroundImageFileDialog".size / 2
+		var dialog_start: Vector2 = dialog_background_image_file.size / 2
 		var dialog_pos: Vector2 = viewport_centre - dialog_start
-		$"InformationWindows/BackgroundImageFileDialog".position = dialog_pos
+		dialog_background_image_file.position = dialog_pos
 
-		$"InformationWindows/BackgroundImageFileDialog".popup_centered()
+		dialog_background_image_file.popup_centered()
 
 
 func _on_SelectBackground_pressed() -> void:
 	var viewport_centre: Vector2 = get_viewport_rect().size / 2
-	var dialog_start: Vector2 = $"InformationWindows/BackgroundImageFileDialog".size / 2
+	var dialog_start: Vector2 = dialog_background_image_file.size / 2
 	var dialog_pos: Vector2 = viewport_centre - dialog_start
-	$"InformationWindows/BackgroundImageFileDialog".position = dialog_pos
+	dialog_background_image_file.position = dialog_pos
 
-	$"InformationWindows/BackgroundImageFileDialog".visible = true
-	$"InformationWindows/BackgroundImageFileDialog".invalidate()
+	dialog_background_image_file.visible = true
+	dialog_background_image_file.invalidate()
 
 
 func _on_BackgroundImageFileDialog_file_selected(path: String) -> void:
@@ -191,7 +188,7 @@ func _on_MainMenuConfirmationDialog_confirmed() -> void:
 
 
 func _on_ChangeRoomFolderButton_pressed() -> void:
-	$"InformationWindows/RoomFolderDialog".popup_centered()
+	dialog_room_folder.popup_centered()
 
 
 func _on_RoomFolderDialog_dir_selected(dir: String) -> void:
