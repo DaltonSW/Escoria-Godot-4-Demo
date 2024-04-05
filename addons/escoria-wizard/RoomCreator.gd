@@ -341,10 +341,8 @@ func create_room(
 	# var ep = EditorPlugin.new()
 	# ep.get_editor_interface().get_resource_filesystem().scan()
 	# ep.free()
-
 	$InformationWindows/CreateCompleteDialog.popup_centered()
-	
-	
+
 
 func _on_CreateButton_pressed() -> void:
 	# Set values to empty if it is placeholder text
@@ -366,112 +364,3 @@ func _on_CreateButton_pressed() -> void:
 		player_scene_path,
 		background_image_path
 		)
-	return
-	
-	var RoomName = %RoomName.text
-
-	if RoomName.length() < 1:
-		error_dialog_generic.dialog_text = "Error!\n\nRoom name must be specified."
-		error_dialog_generic.popup_centered()
-		return
-
-	var ScriptName = %ESCScript.text
-
-	if %UseEmptyRoomScript.button_pressed == false:
-		if ScriptName.length() < 5 or ! ScriptName.substr(ScriptName.length() - 4) == ".esc":
-			error_dialog_generic.dialog_text = "Error!\n\n" \
-			+ "Room ESC script must be a filename ending in '.esc'"
-			error_dialog_generic.popup_centered()
-			return
-
-	if "/" in %ESCScript.text:
-			error_dialog_generic.dialog_text = "Error!\n\n" \
-			+ "Please remove any '/' characters from the name of the Room ESC script."
-			error_dialog_generic.popup_centered()
-			return
-
-	var BaseDir = ProjectSettings.get_setting(ROOM_PATH_SETTING)
-	var ImageSize = Vector2(1,1)
-	var NewRoom = ESCRoom.new()
-
-	NewRoom.name = RoomName
-	NewRoom.global_id = %GlobalID.text
-
-	if ! %ESCScript.text == SCRIPT_SELECT_TEXT and ! %ESCScript.text == SCRIPT_BLANK_TEXT:
-		NewRoom.esc_script = "%s/%s/scripts/%s" % [BaseDir, RoomName, %ESCScript.text]
-
-	if ! %PlayerScene.text == PLAYER_SELECT_TEXT and ! %PlayerScene.text == PLAYER_BLANK_TEXT:
-		var player_scene = load(%PlayerScene.text)
-		NewRoom.player_scene = player_scene
-
-	var Background = ESCBackground.new()
-	Background.name = "Background"
-
-	var BackgroundSize = Vector2.ONE
-
-	if ! %BackgroundImage.text == BACKGROUND_SELECT_TEXT and ! %BackgroundImage.text == BACKGROUND_BLANK_TEXT:
-		Background.texture = %BackgroundPreview.texture
-		BackgroundSize = Background.texture.get_size()
-	else:
-		# Set TextureRect to have the same size as the Viewport so that the room
-		# works even if no texture is set in the TextureRect
-		BackgroundSize = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), \
-							ProjectSettings.get_setting("display/window/size/viewport_height"))
-		Background.size = BackgroundSize
-
-	NewRoom.add_child(Background)
-
-	var NewTerrain = ESCTerrain.new()
-	NewTerrain.name = "WalkableArea"
-	var NewNavigationPolygonInstance = NavigationRegion2D.new()
-
-	var NewNavigationPolygon = NavigationPolygon.new()
-	NewNavigationPolygonInstance.navigation_polygon = NewNavigationPolygon
-
-	NewRoom.add_child(NewTerrain)
-
-	NewTerrain.add_child(NewNavigationPolygonInstance)
-
-	var Objects = Node2D.new()
-	Objects.name = "RoomObjects"
-	NewRoom.add_child(Objects)
-
-	var StartPos = ESCLocation.new()
-	StartPos.name = "StartPos"
-	StartPos.is_start_location = true
-	StartPos.global_id = "%s_start_pos" % RoomName
-	StartPos.position = Vector2(int(BackgroundSize.x / 2), int(BackgroundSize.y / 2))
-	NewRoom.add_child(StartPos)
-
-	get_tree().edited_scene_root.add_child(NewRoom)
-	NewRoom.set_owner(get_tree().edited_scene_root)
-	NewNavigationPolygonInstance.set_owner(NewRoom)
-	NewTerrain.set_owner(NewRoom)
-	Background.set_owner(NewRoom)
-	Objects.set_owner(NewRoom)
-	StartPos.set_owner(NewRoom)
-
-	DirAccess.make_dir_recursive_absolute("%s/%s/scripts" % [BaseDir, RoomName])
-	DirAccess.make_dir_recursive_absolute("%s/%s/objects" % [BaseDir, RoomName])
-	DirAccess.copy_absolute("res://addons/escoria-wizard/room_script_template.esc", "%s/%s/scripts/%s" % \
-		[BaseDir, RoomName, %ESCScript.text])
-
-	# Export scene
-	var packed_scene = PackedScene.new()
-	packed_scene.pack(get_tree().edited_scene_root.get_node(NewRoom.name))
-
-	# Flag suggestions from https://godotengine.org/qa/50437/how-to-turn-a-node-into-a-packedscene-via-gdscript
-	ResourceSaver.save(packed_scene, "%s/%s/%s.tscn" % [BaseDir, RoomName, RoomName], \
-		ResourceSaver.FLAG_CHANGE_PATH|ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS)
-
-	NewRoom.queue_free()
-	get_tree().edited_scene_root.get_node(NewRoom.name).queue_free()
-	# Scan the filesystem so that the new folders show up in the file browser.
-	# Without this you might not see the objects/scripts folders in the filetree.
-	# TODO: Check if necessary in Godot4
-	# var ep = EditorPlugin.new()
-	# ep.get_editor_interface().get_resource_filesystem().scan()
-	# ep.free()
-
-	$InformationWindows/CreateCompleteDialog.popup_centered()
-
