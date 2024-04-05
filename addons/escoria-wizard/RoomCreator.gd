@@ -208,7 +208,10 @@ func create_room(
 	room_name: String,
 	global_id: String,
 	script_name: String,
-	room_base_dir: String
+	room_base_dir: String,
+	player_scene_path: String,
+	background_image_path: String,
+	is_plugin_execution:bool = true
 ) -> void:
 	# Check parameters first
 	if room_name.length() < 1:
@@ -217,7 +220,7 @@ func create_room(
 		return
 	
 	# User wants a script. Check filename
-	if not %NoRoomScript.button_pressed:
+	if not script_name.is_empty():
 		if not script_name.ends_with(".esc") and script_name.length() > 4:
 			error_dialog_generic.dialog_text = "Error!\n\n" \
 			+ "Room ESC script must be a valid filename ending in '.esc'"
@@ -235,9 +238,97 @@ func create_room(
 	new_room.name = room_name
 	new_room.global_id = global_id
 	# Attach script
-	if not %NoRoomScript.button_pressed:
+	if not script_name.is_empty():
 		new_room.esc_script = "%s/%s/scripts/%s" % [room_base_dir, room_name, script_name]
-		
+	# Attach player
+	if not player_scene_path.is_empty():
+		var player_scene = load(player_scene_path)
+		new_room.player_scene = player_scene
+	
+	# Attach background
+	var background = ESCBackground.new()
+	background.name = "Background"
+	
+	var background_size:Vector2 = Vector2.ONE
+	
+	if not background_image_path.is_empty():
+		var image_stream_texture:CompressedTexture2D
+		image_stream_texture = load(background_image_path)
+		background.texture = image_stream_texture
+		background_size = background.texture.get_size()
+	else:
+		# Set TextureRect to have the same size as the Viewport so that the room
+		# works even if no texture is set in the TextureRect
+		background_size = Vector2(ProjectSettings.get_setting("display/window/size/viewport_width"), \
+							ProjectSettings.get_setting("display/window/size/viewport_height"))
+		background.size = background_size
+	new_room.add_child(background)
+	
+	# Attach walkable area
+	var new_terrain = ESCTerrain.new()
+	new_terrain.name = "WalkableArea"
+	var walkable_area:NavigationRegion2D = NavigationRegion2D.new()
+	walkable_area.navigation_polygon = NavigationPolygon.new()
+	new_terrain.add_child(walkable_area)
+	new_room.add_child(new_terrain)
+	
+	# Attach Room object node
+	var room_objects:Node2D = Node2D.new()
+	room_objects.name = "RoomObjects"
+	new_room.add_child(room_objects)
+
+	# Attach Start position
+	var start_pos = ESCLocation.new()
+	start_pos.name = "StartPos"
+	start_pos.is_start_location = true
+	start_pos.global_id = "%s_start_pos" % room_name
+	start_pos.position = Vector2(int(background_size.x / 2), int(background_size.y / 2))
+	new_room.add_child(start_pos)
+
+	# Add scene to tree and set owner
+	get_tree().edited_scene_root.add_child(new_room)
+	new_room.set_owner(get_tree().edited_scene_root)
+	walkable_area.set_owner(new_room)
+	new_terrain.set_owner(new_room)
+	background.set_owner(new_room)
+	room_objects.set_owner(new_room)
+	start_pos.set_owner(new_room)
+	
+	# Create directories and copy template script if wanted
+	DirAccess.make_dir_recursive_absolute("%s/%s/scripts" % [room_base_dir, room_name])
+	DirAccess.make_dir_recursive_absolute("%s/%s/objects" % [room_base_dir, room_name])
+	# Copy script template
+	if not script_name.is_empty():
+		DirAccess.copy_absolute("res://addons/escoria-wizard/room_script_template.esc", "%s/%s/scripts/%s" % \
+			[room_base_dir, room_name, script_name])
+
+	# Export scene
+	var packed_scene = PackedScene.new()
+	if is_plugin_execution:
+		packed_scene.pack(get_tree().edited_scene_root.get_node(str(new_room.name)))
+	else:
+		packed_scene.pack(new_room)
+
+	# Flag suggestions from https://godotengine.org/qa/50437/how-to-turn-a-node-into-a-packedscene-via-gdscript
+	ResourceSaver.save(packed_scene, "%s/%s/%s.tscn" % [room_base_dir, room_name, room_name], \
+		ResourceSaver.FLAG_CHANGE_PATH|ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS)
+
+	new_room.queue_free()
+	
+	if is_plugin_execution:
+		get_tree().edited_scene_root.get_node(str(new_room.name)).queue_free()
+		var plugin_reference = get_node("..").plugin_reference
+		plugin_reference.open_scene(new_room)
+		plugin_reference._make_visible(false)
+	# Scan the filesystem so that the new folders show up in the file browser.
+	# Without this you might not see the objects/scripts folders in the filetree.
+	# TODO: Check if necessary in Godot4
+	# var ep = EditorPlugin.new()
+	# ep.get_editor_interface().get_resource_filesystem().scan()
+	# ep.free()
+
+	$InformationWindows/CreateCompleteDialog.popup_centered()
+	
 	
 
 func _on_CreateButton_pressed() -> void:
