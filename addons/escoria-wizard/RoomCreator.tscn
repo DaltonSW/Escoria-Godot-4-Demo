@@ -245,8 +245,11 @@ text = "Main Menu"
 layout_mode = 2
 
 [node name="PlayerSceneFileDialog" type="FileDialog" parent="InformationWindows"]
+title = "Open a File"
 size = Vector2i(500, 400)
 popup_window = true
+ok_button_text = "Öffnen"
+file_mode = 0
 filters = PackedStringArray("*.tscn, *.scn ; Scene Files")
 
 [node name="ESCScriptFileDialog" type="FileDialog" parent="InformationWindows"]
