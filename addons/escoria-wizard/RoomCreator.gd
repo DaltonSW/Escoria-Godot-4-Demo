@@ -204,6 +204,9 @@ func _on_RoomFolderDialog_dir_selected(dir: String) -> void:
 	%RoomFolder.text = dir
 
 # Creates the room.
+# If parameter script_name is empty, no script will be attached
+# If parameter player_scene_path is empty, no player will be attached
+# If parameter background_image_path is empty, no background will be attached
 func create_room(
 	room_name: String,
 	global_id: String,
@@ -268,6 +271,7 @@ func create_room(
 	var new_terrain = ESCTerrain.new()
 	new_terrain.name = "WalkableArea"
 	var walkable_area:NavigationRegion2D = NavigationRegion2D.new()
+	walkable_area.name = "NavigationRegion2D"
 	walkable_area.navigation_polygon = NavigationPolygon.new()
 	new_terrain.add_child(walkable_area)
 	new_room.add_child(new_terrain)
@@ -286,8 +290,11 @@ func create_room(
 	new_room.add_child(start_pos)
 
 	# Add scene to tree and set owner
-	get_tree().edited_scene_root.add_child(new_room)
-	new_room.set_owner(get_tree().edited_scene_root)
+	# Only working as a plugin
+	if is_plugin_execution:
+		get_tree().edited_scene_root.add_child(new_room)
+		new_room.set_owner(get_tree().edited_scene_root)
+
 	walkable_area.set_owner(new_room)
 	new_terrain.set_owner(new_room)
 	background.set_owner(new_room)
