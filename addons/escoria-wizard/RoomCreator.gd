@@ -46,7 +46,7 @@ func room_creator_reset() -> void:
 	%UseEmptyPlayerButton.button_pressed = true
 	%ESCScript.editable = false
 	%ESCScript.text = SCRIPT_BLANK_TEXT
-	%UseEmptyRoomScript.button_pressed = true
+	%NoRoomScript.button_pressed = true
 	%BackgroundImage.text = BACKGROUND_BLANK_TEXT
 	%UseEmptyRoomSpacer.visible = true
 	%UseEmptyBackground.button_pressed = true
@@ -216,6 +216,13 @@ func create_room(
 	background_image_path: String,
 	is_plugin_execution:bool = true
 ) -> void:
+	print("Creating room:")
+	print("Room Name: ", room_name)
+	print("Global ID: ", global_id)
+	print("Script Name: ", script_name)
+	print("Room Base Directory: ", room_base_dir)
+	print("Player Scene Path: ", player_scene_path)
+	print("Background image path: ", background_image_path)
 	# Check parameters first
 	if room_name.length() < 1:
 		error_dialog_generic.dialog_text = "Error!\n\nRoom name must be specified."
@@ -316,8 +323,9 @@ func create_room(
 	else:
 		packed_scene.pack(new_room)
 
+	var path_to_room_scene = "%s/%s/%s.tscn" % [room_base_dir, room_name, room_name]
 	# Flag suggestions from https://godotengine.org/qa/50437/how-to-turn-a-node-into-a-packedscene-via-gdscript
-	ResourceSaver.save(packed_scene, "%s/%s/%s.tscn" % [room_base_dir, room_name, room_name], \
+	ResourceSaver.save(packed_scene, path_to_room_scene, \
 		ResourceSaver.FLAG_CHANGE_PATH|ResourceSaver.FLAG_REPLACE_SUBRESOURCE_PATHS)
 
 	new_room.queue_free()
@@ -325,7 +333,7 @@ func create_room(
 	if is_plugin_execution:
 		get_tree().edited_scene_root.get_node(str(new_room.name)).queue_free()
 		var plugin_reference = get_node("..").plugin_reference
-		plugin_reference.open_scene(new_room)
+		plugin_reference.open_scene(path_to_room_scene)
 		plugin_reference._make_visible(false)
 	# Scan the filesystem so that the new folders show up in the file browser.
 	# Without this you might not see the objects/scripts folders in the filetree.
@@ -339,6 +347,27 @@ func create_room(
 	
 
 func _on_CreateButton_pressed() -> void:
+	# Set values to empty if it is placeholder text
+	var player_scene_path = %PlayerScene.text
+	var room_script_name = %ESCScript.text
+	var background_image_path = %BackgroundImage.text
+	if player_scene_path == PLAYER_BLANK_TEXT:
+		player_scene_path = ""
+	if room_script_name == SCRIPT_BLANK_TEXT:
+		room_script_name = ""
+	if background_image_path == BACKGROUND_BLANK_TEXT:
+		background_image_path = ""
+	
+	create_room(
+		%RoomName.text, 
+		%GlobalID.text,
+		room_script_name,
+		%RoomFolder.text,
+		player_scene_path,
+		background_image_path
+		)
+	return
+	
 	var RoomName = %RoomName.text
 
 	if RoomName.length() < 1:
@@ -445,3 +474,4 @@ func _on_CreateButton_pressed() -> void:
 	# ep.free()
 
 	$InformationWindows/CreateCompleteDialog.popup_centered()
+
