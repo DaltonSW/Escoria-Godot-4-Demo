@@ -99,9 +99,9 @@ func resize_image() -> void:
 	preview_scale.x =  preview_size.x / image_size.x
 	preview_scale.y =  preview_size.y / image_size.y
 
-	if preview_scale.y > preview_scale.x:
+	if preview_scale.y > preview_scale.x and preview_scale.x < 1:
 		textrect_preview.scale = Vector2(preview_scale.x, preview_scale.x)
-	else:
+	if preview_scale.x > preview_scale.y and preview_scale.y < 1:
 		textrect_preview.scale = Vector2(preview_scale.y, preview_scale.y)
 
 func background_on_ItemName_text_changed(new_text: String) -> void:
