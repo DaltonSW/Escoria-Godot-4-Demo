@@ -33,6 +33,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="BackgroundObjectCheckBox" type="CheckBox" parent="VBoxContainer/Control/CenterContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Create background object"
 
@@ -51,6 +52,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="ObjectHeading" type="Label" parent="VBoxContainer/HelperHeading/CenterContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.592157, 0.87451, 0.533333, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
@@ -58,6 +60,7 @@ text = "Object Creator"
 uppercase = true
 
 [node name="InventoryHeading" type="Label" parent="VBoxContainer/HelperHeading/CenterContainer"]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.592157, 0.87451, 0.533333, 1)
@@ -69,6 +72,7 @@ uppercase = true
 layout_mode = 2
 
 [node name="ObjectDescription" type="Label" parent="VBoxContainer/Description"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "The object creator is used to create background objects
 that the player can interact with, but that will not become
@@ -79,6 +83,7 @@ is currently selected in the scene tree.
 "
 
 [node name="InventoryDescription" type="Label" parent="VBoxContainer/Description"]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "The inventory item creator is used to create objects
@@ -107,6 +112,7 @@ layout_mode = 2
 text = "Item name:"
 
 [node name="ItemName" type="LineEdit" parent="VBoxContainer/Content/GridContainer"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 text = "replace_me"
@@ -119,6 +125,7 @@ layout_mode = 2
 text = "Global ID:"
 
 [node name="ItemGlobalID" type="LineEdit" parent="VBoxContainer/Content/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="BlankItem2" type="Control" parent="VBoxContainer/Content/GridContainer"]
@@ -130,6 +137,7 @@ layout_mode = 2
 text = "Is 'Interactive':"
 
 [node name="StartsInteractiveCheckBox" type="CheckBox" parent="VBoxContainer/Content/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "When the room first loads, can the player interact with this?"
 button_pressed = true
@@ -143,6 +151,7 @@ text = "Default action:
 "
 
 [node name="DefaultActionOption" type="OptionButton" parent="VBoxContainer/Content/GridContainer"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 31)
 layout_mode = 2
 
@@ -154,6 +163,7 @@ layout_mode = 2
 text = "Item graphic:"
 
 [node name="ImagePath" type="LineEdit" parent="VBoxContainer/Content/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 editable = false
 
@@ -165,12 +175,12 @@ text = "Change Image"
 layout_mode = 2
 text = "Preview:"
 
-[node name="Preview" type="ColorRect" parent="VBoxContainer/Content/GridContainer"]
+[node name="PreviewArea" type="ColorRect" parent="VBoxContainer/Content/GridContainer"]
 custom_minimum_size = Vector2(240, 240)
 layout_mode = 2
 color = Color(0.121569, 0.196078, 0.0823529, 1)
 
-[node name="BackgroundColour" type="ColorRect" parent="VBoxContainer/Content/GridContainer/Preview"]
+[node name="BackgroundColour" type="ColorRect" parent="VBoxContainer/Content/GridContainer/PreviewArea"]
 custom_minimum_size = Vector2(232, 232)
 layout_mode = 0
 offset_left = 4.0
@@ -179,7 +189,8 @@ offset_right = 236.0
 offset_bottom = 236.0
 color = Color(0.254902, 0.231373, 0.231373, 1)
 
-[node name="InventoryPreview" type="TextureRect" parent="VBoxContainer/Content/GridContainer/Preview"]
+[node name="InventoryPreview" type="TextureRect" parent="VBoxContainer/Content/GridContainer/PreviewArea"]
+unique_name_in_owner = true
 visible = false
 layout_mode = 0
 offset_left = 4.0
@@ -188,7 +199,9 @@ offset_right = 236.0
 offset_bottom = 236.0
 texture = ExtResource("2")
 
-[node name="ObjectPreview" type="TextureRect" parent="VBoxContainer/Content/GridContainer/Preview"]
+[node name="ObjectPreview" type="TextureRect" parent="VBoxContainer/Content/GridContainer/PreviewArea"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 0
 offset_left = 4.0
 offset_top = 4.0
@@ -196,7 +209,8 @@ offset_right = 236.0
 offset_bottom = 236.0
 texture = ExtResource("3")
 
-[node name="Preview" type="TextureRect" parent="VBoxContainer/Content/GridContainer/Preview"]
+[node name="Preview" type="TextureRect" parent="VBoxContainer/Content/GridContainer/PreviewArea"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(232, 232)
 layout_mode = 0
 offset_left = 4.0
@@ -212,6 +226,7 @@ layout_mode = 2
 text = "Image size:"
 
 [node name="ImageSize" type="Label" parent="VBoxContainer/Content/GridContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "(0, 0)"
 
@@ -219,21 +234,23 @@ text = "(0, 0)"
 layout_mode = 2
 
 [node name="InventoryPathLabel" type="Label" parent="VBoxContainer/Content/GridContainer"]
-visible = false
+unique_name_in_owner = true
 layout_mode = 2
 text = "Inventory path:"
 
 [node name="InventoryPath" type="Label" parent="VBoxContainer/Content/GridContainer"]
-visible = false
+unique_name_in_owner = true
 layout_mode = 2
 text = "res://"
 
-[node name="ChangePathButton" type="Button" parent="VBoxContainer/Content/GridContainer"]
+[node name="ChangeInvPathButton" type="Button" parent="VBoxContainer/Content/GridContainer"]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
 text = "Change Path3D"
 
-[node name="BlankItem7" type="Control" parent="VBoxContainer/Content/GridContainer"]
+[node name="InventoryPathSpacer" type="Control" parent="VBoxContainer/Content/GridContainer"]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
@@ -249,6 +266,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="CreateButton" type="Button" parent="VBoxContainer/Buttons/CenterContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Create Object"
 
@@ -273,7 +291,8 @@ visible = false
 layout_mode = 2
 mouse_filter = 2
 
-[node name="LoadObjectFileDialog" type="FileDialog" parent="LoadObjectGraphic"]
+[node name="SetImageDialog" type="FileDialog" parent="LoadObjectGraphic"]
+unique_name_in_owner = true
 title = "Open a File"
 size = Vector2i(600, 500)
 popup_window = true
@@ -286,12 +305,14 @@ visible = false
 layout_mode = 2
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="Windows"]
+unique_name_in_owner = true
 popup_window = true
 dialog_text = "WARNING!
 
 If you continue you will lose the current object."
 
 [node name="ErrorDialog" type="AcceptDialog" parent="Windows"]
+unique_name_in_owner = true
 popup_window = true
 
 [node name="CreateCompleteDialog" type="AcceptDialog" parent="Windows"]
@@ -310,12 +331,12 @@ file_mode = 2
 [connection signal="text_changed" from="VBoxContainer/Content/GridContainer/ItemGlobalID" to="." method="_on_ItemGlobalID_text_changed"]
 [connection signal="pressed" from="VBoxContainer/Content/GridContainer/StartsInteractiveCheckBox" to="." method="_on_StartsInteractiveCheckBox_pressed"]
 [connection signal="item_selected" from="VBoxContainer/Content/GridContainer/DefaultActionOption" to="." method="_on_DefaultActionOption_item_selected"]
-[connection signal="pressed" from="VBoxContainer/Content/GridContainer/ChangeImageButton" to="." method="load_button_pressed"]
-[connection signal="pressed" from="VBoxContainer/Content/GridContainer/ChangePathButton" to="." method="_on_ChangePathButton_pressed"]
+[connection signal="pressed" from="VBoxContainer/Content/GridContainer/ChangeImageButton" to="." method="change_image_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/Content/GridContainer/ChangeInvPathButton" to="." method="_on_ChangePathButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/CenterContainer/HBoxContainer/CreateButton" to="." method="_on_CreateButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/CenterContainer/HBoxContainer/ClearButton" to="." method="Item_on_ClearButton_pressed"]
 [connection signal="pressed" from="VBoxContainer/Buttons/CenterContainer/HBoxContainer/ExitButton" to="." method="Item_on_ExitButton_pressed"]
-[connection signal="file_selected" from="LoadObjectGraphic/LoadObjectFileDialog" to="." method="LoadObjectFileDialog_file_selected"]
+[connection signal="file_selected" from="LoadObjectGraphic/SetImageDialog" to="." method="LoadObjectFileDialog_file_selected"]
 [connection signal="confirmed" from="Windows/ConfirmationDialog" to="." method="_on_ObjectConfirmationDialog_confirmed"]
 [connection signal="confirmed" from="Windows/CreateCompleteDialog" to="." method="_on_CreateCompleteDialog_confirmed"]
 [connection signal="dir_selected" from="Windows/FileDialog" to="." method="_on_FileDialog_dir_selected"]
