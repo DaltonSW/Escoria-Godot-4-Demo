@@ -274,7 +274,11 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="LoadObjectFileDialog" type="FileDialog" parent="LoadObjectGraphic"]
+title = "Open a File"
+size = Vector2i(600, 500)
 popup_window = true
+ok_button_text = "Öffnen"
+file_mode = 0
 filters = PackedStringArray("*.png", "*.bmp", "*.jpg", "*.jpeg", "*.webp", "*.tga")
 
 [node name="Windows" type="CenterContainer" parent="."]
@@ -294,9 +298,11 @@ popup_window = true
 popup_window = true
 
 [node name="FileDialog" type="FileDialog" parent="Windows"]
-mode = 2
-size = Vector2i(392, 159)
+title = "Open a Directory"
+size = Vector2i(600, 500)
 popup_window = true
+ok_button_text = "Aktuellen Ordner auswählen"
+file_mode = 2
 
 [connection signal="toggled" from="VBoxContainer/Control/CenterContainer/HBoxContainer/BackgroundObjectCheckBox" to="." method="_on_BackgroundObjectCheckBox_toggled"]
 [connection signal="toggled" from="VBoxContainer/Control/CenterContainer/HBoxContainer/InventoryItemCheckBox" to="." method="_on_InventoryItemCheckBox_toggled"]
