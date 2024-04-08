@@ -145,12 +145,12 @@ func _on_CreateButton_pressed() -> void:
 		get_node(ERROR_WINDOW_NODE).popup_centered()
 		return
 
-	if inventory_mode == false:
-		if not EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes():
-			get_node(ERROR_WINDOW_NODE).dialog_text = \
-				"Please select a node in the scene tree\nto attach the object to."
-			get_node(ERROR_WINDOW_NODE).popup_centered()
-			return
+	#if inventory_mode == false:
+	#	if not EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes():
+	#		get_node(ERROR_WINDOW_NODE).dialog_text = \
+	#			"Please select a node in the scene tree\nto attach the object to."
+	#		get_node(ERROR_WINDOW_NODE).popup_centered()
+	#		return
 
 	var item = ESCItem.new()
 	item.name = get_node(ITEM_NAME_NODE).text
@@ -189,8 +189,8 @@ func _on_CreateButton_pressed() -> void:
 	if not inventory_mode:
 		# Create in scene tree
 		# Attach to currently selected node in scene tree
-		var current_node = EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes()[0]
-		current_node.add_child(item)
+		#var current_node = EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes()[0]
+		#current_node.add_child(item)
 		var owning_node = get_tree().edited_scene_root
 		item.set_owner(owning_node)
 		# Make it so all the nodes can be seen in the scene tree
