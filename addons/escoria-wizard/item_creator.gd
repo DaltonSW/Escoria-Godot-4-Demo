@@ -31,6 +31,8 @@ extends MarginContainer
 @onready var button_change_inventory_path:Button = %ChangeInvPathButton
 @onready var button_create_item:Button = %CreateButton
 
+const DEFAULT_ACTION_LIST = ["look", "pick up", "open", "close", "use", "push", "pull", "talk"]
+
 var source_image:Image
 var image_stream_texture:CompressedTexture2D
 var image_has_been_loaded:bool
@@ -47,6 +49,9 @@ func _ready() -> void:
 	# the absolute size before it gets scaled contents applied to it
 	preview_size = textrect_preview.size
 	inventory_mode = not checkbox_is_background_object.pressed
+	# Fill action list
+	for option_list in DEFAULT_ACTION_LIST:
+		option_default_action.add_item(option_list)
 	item_creator_reset()
 
 
@@ -55,13 +60,6 @@ func item_creator_reset() -> void:
 	lineedit_gloabl_id.text = ""
 	lineedit_image_path.text = ""
 	checkbox_is_interactive.button_pressed = true
-
-	if option_default_action.get_item_count() > 0:
-		option_default_action.clear()
-
-		for option_list in ["look", "pick up", "open", "close", "use", "push", "pull", "talk"]:
-			option_default_action.add_item(option_list)
-
 	option_default_action.selected = 0
 	image_size = Vector2.ZERO
 	image_has_been_loaded = false
