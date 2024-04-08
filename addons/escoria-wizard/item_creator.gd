@@ -52,10 +52,12 @@ func _ready() -> void:
 	# Fill action list
 	for option_list in DEFAULT_ACTION_LIST:
 		option_default_action.add_item(option_list)
+	checkbox_is_background_object.button_pressed = true
 	item_creator_reset()
 
 
 func item_creator_reset() -> void:
+	
 	lineedit_item_name.text = "replace_me"
 	lineedit_gloabl_id.text = ""
 	lineedit_image_path.text = ""
@@ -159,7 +161,7 @@ func _on_CreateButton_pressed() -> void:
 	var item = ESCItem.new()
 	item.name = lineedit_item_name.text
 	item.global_id = lineedit_gloabl_id.text
-	item.is_interactive = checkbox_is_interactive.pressed
+	item.is_interactive = checkbox_is_interactive.button_pressed
 	item.tooltip_name = lineedit_item_name.text
 
 	var selected_index = option_default_action.selected
@@ -182,19 +184,27 @@ func _on_CreateButton_pressed() -> void:
 	var collision_shape = CollisionShape2D.new()
 
 	collision_shape.shape = rectangle_shape
+	collision_shape.name = "CollisionShape"
 	collision_shape.shape.extents = image_size / 2
 	item.add_child(collision_shape)
 
 	# Add sprite to the background item
 	var item_sprite = Sprite2D.new()
+	item_sprite.name = item.name+"_Sprite"
 	item_sprite.texture = textrect_preview.texture
 	item.add_child(item_sprite)
 
 	if not inventory_mode:
 		# Create in scene tree
 		# Attach to currently selected node in scene tree
-		#var current_node = EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes()[0]
-		#current_node.add_child(item)
+		if not EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes():
+			dialog_error.dialog_text = \
+				"Please select a node in the editor where\n" + \
+				"the new item can be placed."
+			dialog_error.popup_centered()
+			return
+		var current_node = EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes()[0]
+		current_node.add_child(item)
 		var owning_node = get_tree().edited_scene_root
 		item.set_owner(owning_node)
 		# Make it so all the nodes can be seen in the scene tree
@@ -202,13 +212,13 @@ func _on_CreateButton_pressed() -> void:
 		interact_position.set_owner(owning_node)
 		item_sprite.set_owner(owning_node)
 
-		get_node("Windows/CreateCompleteDialog").dialog_text = \
+		dialog_confirmation.dialog_text = \
 			"Background object %s created.\n\n" % item + \
 			"Note that you can right-click the node in the\n" + \
 			"scene tree and select \"Save branch as scene\"\n" + \
 			"if you'd like to reuse this item."
 		print("Background object %s created." % item)
-		get_node("Windows/CreateCompleteDialog").popup_centered()
+		dialog_confirmation.popup_centered()
 	else:
 		get_tree().edited_scene_root.add_child(item)
 		# Make it so all the nodes can be seen in the scene tree
@@ -220,7 +230,7 @@ func _on_CreateButton_pressed() -> void:
 		# Export scene - create in inventory folder
 		var packed_scene = PackedScene.new()
 
-		packed_scene.pack(get_tree().edited_scene_root.get_node(item.name))
+		packed_scene.pack(get_tree().edited_scene_root.get_node(str(item.name)))
 
 		# Flag suggestions from https://godotengine.org/qa/50437/how-to-turn-a-node-into-a-packedscene-via-gdscript
 		var err = ResourceSaver.save(packed_scene, "%s/%s.tscn" % [inventory_path, lineedit_item_name.text], \
@@ -233,11 +243,11 @@ func _on_CreateButton_pressed() -> void:
 			return
 		else:
 			item.queue_free()
-			get_tree().edited_scene_root.get_node(item.name).queue_free()
-			get_node("Windows/CreateCompleteDialog").dialog_text = \
+			get_tree().edited_scene_root.get_node(str(item.name)).queue_free()
+			dialog_confirmation.dialog_text = \
 				"Inventory item %s/%s.tscn created." % [inventory_path, lineedit_item_name.text]
 			print("Inventory item %s/%s.tscn created." % [inventory_path, lineedit_item_name.text])
-			get_node("Windows/CreateCompleteDialog").popup_centered()
+			dialog_confirmation.popup_centered()
 
 
 func Item_on_ClearButton_pressed() -> void:
