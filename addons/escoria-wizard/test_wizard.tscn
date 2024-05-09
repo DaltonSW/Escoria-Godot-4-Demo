@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://dq15h3k4py8pl"]
+
+[ext_resource type="PackedScene" uid="uid://d1rheu6fibsxn" path="res://addons/escoria-wizard/escoria_wizard.tscn" id="1_4komk"]
+
+[node name="TestWizard" type="Node2D"]
+
+[node name="EscoriaWizard" parent="." instance=ExtResource("1_4komk")]
+offset_right = 1290.0
+offset_bottom = 900.0
+grow_horizontal = 2
+grow_vertical = 2

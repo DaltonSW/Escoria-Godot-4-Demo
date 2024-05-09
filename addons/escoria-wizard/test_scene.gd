@@ -9,4 +9,4 @@ extends Node2D
 func _ready():
 	print("It works")
 	$CharacterCreator.setup_test_data()
-	$CharacterCreator.export_player_new()
+	$CharacterCreator.export_player()
