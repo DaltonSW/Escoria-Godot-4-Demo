@@ -5,7 +5,7 @@ class_name ESCMain
 
 var escoria_node: Escoria
 
-var wizard_test: bool = true
+var wizard_test: bool = false
 
 # Start the main menu
 func _ready():
