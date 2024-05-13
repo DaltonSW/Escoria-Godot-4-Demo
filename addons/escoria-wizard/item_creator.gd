@@ -197,13 +197,13 @@ func _on_CreateButton_pressed() -> void:
 	if not inventory_mode:
 		# Create in scene tree
 		# Attach to currently selected node in scene tree
-		if not EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes():
+		if not EditorInterface.get_editor_settings().get_selection().get_selected_nodes():
 			dialog_error.dialog_text = \
 				"Please select a node in the editor where\n" + \
 				"the new item can be placed."
 			dialog_error.popup_centered()
 			return
-		var current_node = EditorPlugin.new().get_editor_interface().get_selection().get_selected_nodes()[0]
+		var current_node = EditorInterface.get_editor_settings().get_selection().get_selected_nodes()[0]
 		current_node.add_child(item)
 		var owning_node = get_tree().edited_scene_root
 		item.set_owner(owning_node)

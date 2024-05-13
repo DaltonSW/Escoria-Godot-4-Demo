@@ -5,14 +5,14 @@ class_name ESCMain
 
 var escoria_node: Escoria
 
-var wizard_test: bool = true
+var wizard_test: bool = false
 
 # Start the main menu
 func _ready():
 	escoria.logger.info(self, "Escoria starts...")
 	if wizard_test:
 		escoria.logger.info(self, "Starting wizard test...")
-		var test_node = preload("res://addons/escoria-wizard/test_scene.tscn").instantiate()
+		var test_node = preload("res://addons/escoria-wizard/test_wizard.tscn").instantiate()
 		add_child(test_node)
 		return
 
