@@ -43,6 +43,7 @@ var global_id: String = ""
 func _init(p_item: ESCInventoryItem) -> void:
 	global_id = p_item.global_id
 	texture_normal = p_item.texture
+	ignore_texture_size = true
 	stretch_mode = TextureButton.STRETCH_KEEP_ASPECT
 
 
