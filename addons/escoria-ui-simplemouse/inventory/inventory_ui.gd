@@ -7,6 +7,7 @@ var inventory_visible: bool = false
 @onready var _tween: Tween3 = Tween3.new(self)
 
 func _ready() -> void:
+	super._ready()
 	# Hide inventory by default
 	$FloatingInventory/panel.position.x = \
 		ProjectSettings.get_setting("display/window/size/viewport_width")

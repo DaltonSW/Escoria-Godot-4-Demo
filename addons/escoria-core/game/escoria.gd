@@ -175,7 +175,7 @@ func new_game():
 
 # Function called to quit the game.
 func quit():
-	get_tree().notification(NOTIFICATION_WM_CLOSE_REQUEST)
+	get_tree().root.propagate_notification(NOTIFICATION_WM_CLOSE_REQUEST)
 
 
 # Handle anything necessary if the game started a scene directly.
