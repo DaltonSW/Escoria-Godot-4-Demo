@@ -7,7 +7,7 @@ var popup_info: AcceptDialog
 
 
 # Virtual function called when plugin is enabled.
-func enable_plugin():
+func _enable_plugin():
 	add_autoload_singleton(
 		"escoria",
 		"res://addons/escoria-core/game/esc_autoload.gd"

@@ -15,7 +15,7 @@ func _disable_plugin():
 
 
 # Register UI with Escoria
-func enable_plugin():
+func _enable_plugin():
 	print("Enabling plugin Escoria UI Simple Mouse.")
 	if not EscoriaPlugin.register_ui(self, "res://addons/escoria-ui-simplemouse/game.tscn"):
 		get_editor_interface().set_plugin_enabled(

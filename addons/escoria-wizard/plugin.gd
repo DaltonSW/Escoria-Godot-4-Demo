@@ -48,7 +48,7 @@ func _disable_plugin():
 	)
 
 # Register ourselves
-func enable_plugin():
+func _enable_plugin():
 	print("Enabling Escoria Wizard plugin")
 	ESCProjectSettingsManager.register_setting(
 		"escoria/wizard/path_to_rooms",
